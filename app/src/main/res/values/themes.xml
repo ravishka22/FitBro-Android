@@ -1,0 +1,53 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme (Light Mode) -->
+    <style name="Theme.FitBro" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/electric_green</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/electric_green_variant</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/electric_green</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        
+        <!-- Backgrounds -->
+        <item name="android:windowBackground">@color/white</item>
+        
+        <!-- Custom attributes -->
+        <item name="logoSrc">@drawable/logo_light</item>
+
+        <!-- Apply Pill Styles globally -->
+        <item name="materialButtonStyle">@style/Widget.FitBro.Button</item>
+        <item name="textInputStyle">@style/Widget.FitBro.TextInputLayout</item>
+    </style>
+
+    <!-- Pill shaped Button Style -->
+    <style name="Widget.FitBro.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">28dp</item>
+    </style>
+
+    <!-- Pill shaped TextInputLayout Style -->
+    <style name="Widget.FitBro.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">28dp</item>
+        <item name="boxCornerRadiusTopEnd">28dp</item>
+        <item name="boxCornerRadiusBottomStart">28dp</item>
+        <item name="boxCornerRadiusBottomEnd">28dp</item>
+    </style>
+    
+    <style name="ShapeAppearance.FitBro.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearance.FitBro.RoundedSquare" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+    
+    <attr name="logoSrc" format="reference" />
+</resources>
