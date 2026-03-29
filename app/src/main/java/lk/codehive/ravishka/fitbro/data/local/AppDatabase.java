@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import lk.codehive.ravishka.fitbro.models.WorkoutPlan;
 import lk.codehive.ravishka.fitbro.models.WorkoutSession;
 
-@Database(entities = {WorkoutPlan.class, WorkoutSession.class}, version = 2, exportSchema = false)
+@Database(entities = {WorkoutPlan.class, WorkoutSession.class}, version = 11, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

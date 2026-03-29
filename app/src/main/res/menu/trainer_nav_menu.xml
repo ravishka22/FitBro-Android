@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/trainer_nav_home"
+        android:icon="@android:drawable/ic_menu_today"
+        android:title="Home" />
+    <item
+        android:id="@+id/trainer_nav_plans"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Plans" />
+    <item
+        android:id="@+id/trainer_nav_gyms"
+        android:icon="@android:drawable/ic_dialog_map"
+        android:title="Gyms" />
+    <item
+        android:id="@+id/trainer_nav_exercises"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Exercises" />
+    <item
+        android:id="@+id/trainer_nav_profile"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Profile" />
+</menu>

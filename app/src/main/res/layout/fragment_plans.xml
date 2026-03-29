@@ -1,171 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="match_parent"
+        android:background="#F8F9FA">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="My Plans"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary" />
-
-        <!-- Requested Plan Status Section -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardRequestedStatus"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:visibility="gone"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="?attr/colorPrimary"
-            tools:visibility="visible">
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Training Plans"
+                android:textColor="#1A1A1A"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <!-- Requested Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRequestedStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="0dp"
+                tools:visibility="visible">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+                    
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="#F0F0F0"
+                        android:padding="10dp"
+                        android:src="@android:drawable/ic_menu_agenda"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
+                        app:tint="@color/electric_green_variant" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Custom Request"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/tvRequestStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Trainer is building..."
+                            android:textSize="12sp"
+                            android:textColor="#757575" />
+                    </LinearLayout>
+                    
+                    <ImageButton
+                        android:id="@+id/btnEditRequest"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#757575" />
+
+                    <ImageButton
+                        android:id="@+id/btnCancelRequest"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@android:drawable/ic_menu_close_clear_cancel"
+                        app:tint="@color/error_red" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="ACTIVE WORKOUT"
+                android:textColor="#757575"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardActivePlan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/tvActivePlanTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No Active Plan"
+                        android:textColor="#1A1A1A"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvActivePlanDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Create or activate a plan to begin"
+                        android:textColor="#757575"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStartTraining"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="24dp"
+                        android:text="START TRAINING NOW"
+                        android:textColor="@color/black"
+                        android:backgroundTint="@color/electric_green"
+                        android:textStyle="bold"
+                        app:cornerRadius="30dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
-                android:gravity="center_vertical">
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_agenda"
-                    app:tint="?attr/colorPrimary" />
-                <LinearLayout
+                android:layout_marginTop="24dp">
+                
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCreatePlan"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="16dp"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Requested Plan"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:id="@+id/tvRequestStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pending Trainer Approval"
-                        android:textSize="12sp"
-                        android:textColor="?android:attr/textColorSecondary" />
-                </LinearLayout>
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Featured Active Plan Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="ACTIVE PLAN"
-            android:textSize="12sp"
-            android:letterSpacing="0.1"
-            android:textStyle="bold"
-            android:textColor="?attr/colorPrimary" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardActivePlan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvActivePlanTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="3-Day Split Workout"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvActivePlanDesc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Next: Day 2 Biceps and Triceps"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp" />
+                    android:layout_marginEnd="8dp"
+                    android:text="Build Plan"
+                    android:textSize="13sp"
+                    app:cornerRadius="16dp"
+                    app:icon="@android:drawable/ic_menu_add" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnStartTraining"
-                    android:layout_width="match_parent"
+                    android:id="@+id/btnRequestPlan"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
                     android:layout_height="56dp"
-                    android:layout_marginTop="20dp"
-                    android:text="START TRAINING"
-                    android:textStyle="bold"
-                    app:cornerRadius="28dp" />
-
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Coach Plan"
+                    android:textSize="13sp"
+                    app:cornerRadius="16dp"
+                    app:icon="@android:drawable/ic_menu_agenda" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Other Plans Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="OTHER PLANS"
-            android:textSize="12sp"
-            android:letterSpacing="0.1"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorSecondary" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="YOUR LIBRARY"
+                android:textColor="#757575"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvOtherPlans"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_workout_plan_summary" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvOtherPlans"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false"
+                android:paddingBottom="40dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_workout_plan_summary" />
 
-        <!-- Separate Action Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="24dp">
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCreatePlan"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="CREATE"
-                android:textStyle="bold" />
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRequestPlan"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="REQUEST"
-                android:textStyle="bold" />
         </LinearLayout>
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

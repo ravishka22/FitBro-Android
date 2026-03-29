@@ -1,284 +1,357 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="match_parent"
+        android:background="?android:attr/windowBackground">
 
-        <!-- Header Area -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp">
+            android:orientation="vertical"
+            android:padding="24dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/tvGreeting"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hello, Alex!"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ready for your workout?"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivProfileImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:padding="2dp"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
-                app:strokeColor="?attr/colorPrimary"
-                app:strokeWidth="2dp" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- Daily Overview Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:strokeColor="?attr/colorPrimary"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
+            <!-- Elegant Header with Profile and Quick Action -->
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_marginBottom="32dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="Daily Overview"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/flProfileContainer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tvGreeting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hi, Alex 👋"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Let's reach your goals today!"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/flProfileContainer"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivProfileImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
+                        app:strokeColor="@color/electric_green"
+                        app:strokeWidth="2dp" />
+
+                    <TextView
+                        android:id="@+id/tvProfilePlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/circle_placeholder"
+                        android:gravity="center"
+                        android:text="A"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Sophisticated Activity Ring Dashboard -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="28dp"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-                    <!-- Calories -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <ProgressBar
-                            android:id="@+id/pbCalories"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:indeterminate="false"
-                            android:max="100"
-                            android:progress="70"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
-
+                        android:layout_marginBottom="24dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Calories"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <!-- Active Time -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <ProgressBar
-                            android:id="@+id/pbActiveTime"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:indeterminate="false"
-                            android:max="100"
-                            android:progress="45"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
-
+                            android:text="Daily Activity"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Active"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                            android:layout_alignParentEnd="true"
+                            android:text="View Details"
+                            android:textColor="@color/electric_green"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+                    </RelativeLayout>
 
-                    <!-- Steps -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="horizontal">
 
-                        <ProgressBar
-                            android:id="@+id/pbSteps"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:indeterminate="false"
-                            android:max="100"
-                            android:progress="80"
-                            android:progressDrawable="@drawable/circular_progress_bar" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Calories Ring -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Steps"
-                            android:textSize="12sp" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/pbCalories"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:progress="70"
+                                app:indicatorColor="@color/electric_green"
+                                app:indicatorSize="70dp"
+                                app:trackColor="?attr/colorOutlineVariant"
+                                app:trackThickness="8dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="Calories"
+                                android:textStyle="bold"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Active Time Ring -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/pbActiveTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:progress="45"
+                                app:indicatorColor="@color/electric_green"
+                                app:indicatorSize="70dp"
+                                app:trackColor="?attr/colorOutlineVariant"
+                                app:trackThickness="8dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="Active"
+                                android:textStyle="bold"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Steps Ring -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/pbSteps"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:progress="80"
+                                app:indicatorColor="@color/electric_green"
+                                app:indicatorSize="70dp"
+                                app:trackColor="?attr/colorOutlineVariant"
+                                app:trackThickness="8dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="Steps"
+                                android:textStyle="bold"
+                                android:textSize="13sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>
 
-        <!-- Today's Workout Banner -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="?attr/colorPrimaryContainer"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <!-- Focus Workout Banner -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp">
+                android:layout_marginBottom="32dp"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="12dp"
+                app:cardBackgroundColor="@color/black"
+                app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/tvWorkoutTitle"
-                    android:layout_width="wrap_content"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Today's Workout"
-                    android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:padding="28dp">
 
-                <TextView
-                    android:id="@+id/tvWorkoutSubtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Full Body Blast • 45 mins"
-                    android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvWorkoutTitle" />
+                    <TextView
+                        android:id="@+id/tvWorkoutTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/membership_card_gradient"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="RECOMMENDED"
+                        android:textColor="@color/black"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnStartWorkout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:backgroundTint="?attr/colorOnPrimaryContainer"
-                    android:text="START WORKOUT"
-                    android:textColor="?attr/colorPrimaryContainer"
-                    android:textStyle="bold"
-                    app:cornerRadius="24dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvWorkoutSubtitle" />
+                    <TextView
+                        android:id="@+id/tvWorkoutTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Next Session"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvWorkoutTag" />
 
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:alpha="0.3"
-                    android:src="@android:drawable/ic_menu_directions"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="?attr/colorOnPrimaryContainer" />
+                    <TextView
+                        android:id="@+id/tvWorkoutSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Day 1 • Upper Body Strength"
+                        android:textColor="@color/white"
+                        android:alpha="0.7"
+                        android:textSize="15sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvWorkoutTitle" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStartWorkout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="24dp"
+                        android:paddingHorizontal="32dp"
+                        android:text="GO TRAIN"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/electric_green"
+                        app:cornerRadius="28dp"
+                        app:icon="@android:drawable/ic_media_play"
+                        app:iconTint="@color/black"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvWorkoutSubtitle" />
 
-        <!-- Nearby Gyms Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Find a Gym Nearby"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+                    <ImageView
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:alpha="0.15"
+                        android:src="@drawable/logo_dark"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:tint="@color/electric_green" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardNearbyGym"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp">
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <!-- Discovery Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Explore Community"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardNearbyGym"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
 
-                <ImageView
-                    android:id="@+id/ivGymIcon"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/circular_progress_bar"
-                    android:padding="12dp"
-                    android:src="@android:drawable/ic_dialog_map"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="?attr/colorPrimary" />
-
-                <TextView
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Discover gyms near your location and start training today!"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/ivGymIcon"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:padding="20dp">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivGymIcon"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/membership_card_gradient"
+                        android:padding="16dp"
+                        android:src="@android:drawable/ic_dialog_map"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/black" />
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                    <TextView
+                        android:id="@+id/tvGymTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:text="Partner Gyms"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivGymIcon"
+                        app:layout_constraintTop_toTopOf="@id/ivGymIcon" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Find certified FitBro facilities near you"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="13sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvGymTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvGymTitle" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

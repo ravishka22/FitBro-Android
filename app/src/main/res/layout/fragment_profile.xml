@@ -1,166 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/profileScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp">
 
-        <!-- Profile Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:layout_marginBottom="32dp">
+            android:padding="24dp">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivProfileImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:padding="4dp"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
-                app:strokeColor="?attr/colorPrimary"
-                app:strokeWidth="3dp" />
-
-            <TextView
-                android:id="@+id/tvUserName"
-                android:layout_width="wrap_content"
+            <!-- Profile Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
                 android:layout_marginTop="16dp"
-                android:text="Alex Johnson"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:layout_marginBottom="32dp">
 
-            <TextView
-                android:id="@+id/tvUserEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="alex.fitness@email.com"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
+                <FrameLayout
+                    android:id="@+id/flProfileImageContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-            <!-- Membership Badge -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMembership"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivProfileImage"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/logo_dark"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
+                        app:strokeColor="@color/electric_green"
+                        app:strokeWidth="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvProfilePlaceholder"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        android:background="@drawable/circle_placeholder"
+                        android:gravity="center"
+                        android:text="U"
+                        android:textColor="@color/white"
+                        android:textSize="48sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnChangePhoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        app:fabCustomSize="40dp"
+                        app:maxImageSize="20dp"
+                        android:src="@android:drawable/ic_menu_camera"
+                        app:backgroundTint="@color/electric_green"
+                        app:tint="@color/black" />
+                </FrameLayout>
 
                 <TextView
-                    android:id="@+id/tvMembershipStatus"
+                    android:id="@+id/tvUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    paddingHorizontal="16dp"
-                    paddingVertical="4dp"
-                    android:text="FREE MEMBER"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:textSize="12sp"
+                    android:layout_marginTop="16dp"
+                    android:text="FitBro User"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="28sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvUserEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.7"
+                    android:text="user@fitbro.com"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipMembership"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="FREE MEMBER"
+                    android:textColor="@color/black"
+                    app:chipBackgroundColor="@color/electric_green"
+                    app:chipIcon="@android:drawable/btn_star_big_on"
+                    app:chipIconTint="@color/black"
+                    app:chipStrokeWidth="0dp" />
+            </LinearLayout>
+
+            <!-- Action Sections -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEditProfile"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Edit Profile Information"
+                        android:textColor="?android:attr/textColorPrimary"
+                        app:icon="@android:drawable/ic_menu_edit"
+                        app:iconTint="@color/electric_green" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnUpgrade"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Manage Membership"
+                        android:textColor="?android:attr/textColorPrimary"
+                        app:icon="@android:drawable/btn_star_big_on"
+                        app:iconTint="@color/electric_green" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResetPassword"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Change Password"
+                        android:textColor="?android:attr/textColorPrimary"
+                        app:icon="@android:drawable/ic_lock_idle_lock"
+                        app:iconTint="@color/electric_green" />
+
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Preferences Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp">
+                        <ImageView
+                            android:id="@+id/ivDarkModeIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_gallery"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:tint="@color/electric_green" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dark Mode"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:layout_marginStart="16dp"
+                            app:layout_constraintStart_toEndOf="@id/ivDarkModeIcon"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switchDarkMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Destructive Actions -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="LOGOUT"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                app:backgroundTint="#2C2C2C"
+                app:cornerRadius="30dp"
+                app:icon="@android:drawable/ic_lock_power_off"
+                app:iconTint="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteAccount"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Delete My Account Permanently"
+                android:textColor="@color/error_red"
+                android:textSize="12sp" />
+
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <!-- Profile Options -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Account"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEditProfile"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="12dp"
-            android:text="Edit Profile"
-            android:gravity="start|center_vertical"
-            app:icon="@android:drawable/ic_menu_edit"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUpgrade"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="12dp"
-            android:text="Upgrade to PRO"
-            android:gravity="start|center_vertical"
-            app:icon="@android:drawable/btn_star_big_on"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRequestPlan"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="12dp"
-            android:text="Request Plan from Trainer"
-            android:gravity="start|center_vertical"
-            app:icon="@android:drawable/ic_menu_agenda"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Support"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnHelp"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="12dp"
-            android:text="Help &amp; Support"
-            android:gravity="start|center_vertical"
-            app:icon="@android:drawable/ic_menu_help"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSettings"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="12dp"
-            android:text="Settings"
-            android:gravity="start|center_vertical"
-            app:icon="@android:drawable/ic_menu_preferences"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogout"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="Logout"
-            android:textColor="@color/error_red"
-            app:icon="@android:drawable/ic_lock_power_off"
-            app:iconTint="@color/error_red" />
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

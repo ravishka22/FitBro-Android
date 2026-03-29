@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 
@@ -18,6 +19,8 @@ import java.util.List;
 import lk.codehive.ravishka.fitbro.R;
 import lk.codehive.ravishka.fitbro.databinding.ActivityActiveWorkoutBinding;
 import lk.codehive.ravishka.fitbro.models.Exercise;
+import lk.codehive.ravishka.fitbro.models.WorkoutDay;
+import lk.codehive.ravishka.fitbro.models.WorkoutPlan;
 import lk.codehive.ravishka.fitbro.models.WorkoutSession;
 import lk.codehive.ravishka.fitbro.viewmodels.WorkoutViewModel;
 
@@ -25,11 +28,13 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
 
     private ActivityActiveWorkoutBinding binding;
     private WorkoutViewModel viewModel;
-    private List<Exercise> workoutExercises;
+    private List<Exercise> workoutExercises = new ArrayList<>();
     private int currentExerciseIndex = 0;
+    private int currentSet = 1;
     private long startTime;
+    private String planName;
+    private String dayTitle;
 
-    // Rest Timer variables
     private BottomSheetDialog restSheet;
     private CountDownTimer restTimer;
     private long remainingRestTime;
@@ -44,31 +49,50 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(WorkoutViewModel.class);
         startTime = System.currentTimeMillis();
 
-        loadMockExercises();
-        displayExercise(currentExerciseIndex);
+        planName = getIntent().getStringExtra("PLAN_NAME");
+        dayTitle = getIntent().getStringExtra("DAY_TITLE");
+
+        setupObservers();
         setupListeners();
     }
 
-    private void loadMockExercises() {
-        workoutExercises = new ArrayList<>();
-        workoutExercises.add(new Exercise("Dumbbell Incline Fly", "Chest", 3, "12", "60", ""));
-        workoutExercises.add(new Exercise("Bench Press", "Chest", 3, "10", "90", ""));
-        workoutExercises.add(new Exercise("Push-Ups", "Chest", 3, "15", "45", ""));
+    private void setupObservers() {
+        viewModel.getActivePlan().observe(this, plan -> {
+            if (plan != null && workoutExercises.isEmpty()) {
+                for (WorkoutDay day : plan.getDays()) {
+                    if (day.getDayTitle().equals(dayTitle)) {
+                        workoutExercises = day.getExercises();
+                        updateSessionProgress();
+                        displayExercise(currentExerciseIndex);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void updateSessionProgress() {
+        if (workoutExercises.isEmpty()) return;
+        int progress = (int) (((float) currentExerciseIndex / workoutExercises.size()) * 100);
+        binding.sessionProgress.setProgress(progress, true);
     }
 
     private void displayExercise(int index) {
-        if (index < 0 || index >= workoutExercises.size()) return;
+        if (workoutExercises == null || workoutExercises.isEmpty() || index < 0 || index >= workoutExercises.size()) return;
 
         Exercise ex = workoutExercises.get(index);
         binding.tvExerciseTitle.setText(ex.getName());
-        binding.tvExerciseSub.setText("Exercise " + (index + 1) + " of " + workoutExercises.size() + " • " + ex.getSets() + " Sets");
-        
-        binding.tvInstructions.setText("1. Position yourself correctly.\n2. Perform " + ex.getReps() + " repetitions with controlled motion.\n3. Keep your core tight and breathe steadily.");
+        binding.tvExerciseSub.setText("Set " + currentSet + " of " + ex.getSets() + " • " + ex.getReps() + " Reps");
+        binding.tvInstructions.setText("1. Prepare your equipment.\n2. Maintain correct form throughout the movement.\n3. Breathe out on exertion.\n4. Complete all " + ex.getReps() + " repetitions.");
 
-        if (index == workoutExercises.size() - 1) {
+        if (ex.getImageUrl() != null && !ex.getImageUrl().isEmpty()) {
+            Glide.with(this).load(ex.getImageUrl()).placeholder(R.drawable.logo_dark).into(binding.ivExerciseLarge);
+        }
+
+        if (index == workoutExercises.size() - 1 && currentSet == ex.getSets()) {
             binding.btnDone.setText("FINISH WORKOUT");
         } else {
-            binding.btnDone.setText("DONE");
+            binding.btnDone.setText("COMPLETE SET");
         }
     }
 
@@ -79,6 +103,8 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
             if (currentExerciseIndex < workoutExercises.size() - 1) {
                 resetTimerState();
                 currentExerciseIndex++;
+                currentSet = 1;
+                updateSessionProgress();
                 displayExercise(currentExerciseIndex);
             }
         });
@@ -87,15 +113,22 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
             if (currentExerciseIndex > 0) {
                 resetTimerState();
                 currentExerciseIndex--;
+                currentSet = 1;
+                updateSessionProgress();
                 displayExercise(currentExerciseIndex);
             }
         });
 
         binding.btnDone.setOnClickListener(v -> {
-            if (currentExerciseIndex == workoutExercises.size() - 1) {
-                finishWorkout();
-            } else {
+            Exercise currentEx = workoutExercises.get(currentExerciseIndex);
+            if (currentSet < currentEx.getSets()) {
                 showRestTimerSheet();
+            } else {
+                if (currentExerciseIndex == workoutExercises.size() - 1) {
+                    finishWorkout();
+                } else {
+                    showRestTimerSheet();
+                }
             }
         });
     }
@@ -112,7 +145,7 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
     }
 
     private void showRestTimerSheet() {
-        resetTimerState(); // Ensure a clean start for every rest period
+        resetTimerState();
 
         restSheet = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.layout_rest_timer_sheet, null);
@@ -126,9 +159,13 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
         MaterialButton btnSkip = view.findViewById(R.id.btnSkipRest);
 
         Exercise currentEx = workoutExercises.get(currentExerciseIndex);
-        long restMillis = Long.parseLong(currentEx.getRest()) * 1000;
+        long restSeconds = 60;
+        try {
+            String restStr = currentEx.getRest().replaceAll("[^0-9]", "");
+            if (!restStr.isEmpty()) restSeconds = Long.parseLong(restStr);
+        } catch (Exception ignored) {}
         
-        startRestTimer(restMillis, tvTimer, pbTimer);
+        startRestTimer(restSeconds * 1000, tvTimer, pbTimer);
 
         btnPause.setOnClickListener(v -> {
             if (isTimerPaused) {
@@ -143,7 +180,6 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
         });
 
         btnExtend.setOnClickListener(v -> {
-            // Extend remaining time and restart timer
             long newTime = remainingRestTime + 10000;
             startRestTimer(newTime, tvTimer, pbTimer);
             isTimerPaused = false;
@@ -152,7 +188,7 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
 
         btnSkip.setOnClickListener(v -> {
             resetTimerState();
-            moveToNextExercise();
+            advanceWorkout();
         });
 
         restSheet.show();
@@ -160,9 +196,7 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
 
     private void startRestTimer(long duration, TextView tvTimer, android.widget.ProgressBar pbTimer) {
         if (restTimer != null) restTimer.cancel();
-        
         remainingRestTime = duration;
-        // Using a fixed max for progress or update max dynamically
         pbTimer.setMax((int) duration);
         
         restTimer = new CountDownTimer(duration, 100) {
@@ -179,25 +213,30 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
                 tvTimer.setText("00:00");
                 pbTimer.setProgress(0);
                 resetTimerState();
-                moveToNextExercise();
+                advanceWorkout();
             }
         }.start();
     }
 
-    private void moveToNextExercise() {
-        if (currentExerciseIndex < workoutExercises.size() - 1) {
+    private void advanceWorkout() {
+        Exercise currentEx = workoutExercises.get(currentExerciseIndex);
+        if (currentSet < currentEx.getSets()) {
+            currentSet++;
+        } else {
             currentExerciseIndex++;
-            displayExercise(currentExerciseIndex);
+            currentSet = 1;
         }
+        updateSessionProgress();
+        displayExercise(currentExerciseIndex);
     }
 
     private void finishWorkout() {
         long duration = System.currentTimeMillis() - startTime;
         WorkoutSession session = new WorkoutSession(
-                "3-Day Split", "Upper Body", System.currentTimeMillis(), 350, duration
+                planName, dayTitle, System.currentTimeMillis(), workoutExercises.size() * 45, duration
         );
         viewModel.insertSession(session);
-        Toast.makeText(this, "Workout Completed!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Excellent! Workout Saved.", Toast.LENGTH_LONG).show();
         finish();
     }
 

@@ -22,7 +22,7 @@
                 android:id="@+id/tvCreateTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create Advanced Plan"
+                android:text="Create Workout Plan"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -102,6 +102,16 @@
                     android:text="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Template Option for Trainer -->
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchSaveAsTemplate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Save as Reusable Template"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Tabs for Days -->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayoutDays"
@@ -110,7 +120,6 @@
                 android:layout_marginTop="24dp"
                 app:tabMode="scrollable" />
 
-            <!-- Exercise Selection for the active day -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

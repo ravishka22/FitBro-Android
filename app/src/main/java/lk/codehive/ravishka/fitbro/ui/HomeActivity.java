@@ -3,14 +3,15 @@ package lk.codehive.ravishka.fitbro.ui;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import lk.codehive.ravishka.fitbro.R;
 import lk.codehive.ravishka.fitbro.databinding.ActivityHomeBinding;
-import lk.codehive.ravishka.fitbro.models.Product;
-import lk.codehive.ravishka.fitbro.ui.adapters.ProductAdapter;
+import lk.codehive.ravishka.fitbro.ui.fragments.FitnessFragment;
+import lk.codehive.ravishka.fitbro.ui.fragments.HomeFragment;
+import lk.codehive.ravishka.fitbro.ui.fragments.MapFragment;
+import lk.codehive.ravishka.fitbro.ui.fragments.PlansFragment;
+import lk.codehive.ravishka.fitbro.ui.fragments.ProfileFragment;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -22,22 +23,43 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setupProductList();
+        setupNavigation();
+        
+        // Load default fragment
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
+        }
     }
 
-    private void setupProductList() {
-        // Mock Data
-        List<Product> products = new ArrayList<>();
-        products.add(new Product("1", "Gold Standard Whey", "High quality protein", 89.99, "https://example.com/whey.png", "Protein"));
-        products.add(new Product("2", "Micronized Creatine", "Strength & Power", 34.99, "https://example.com/creatine.png", "Creatine"));
-        products.add(new Product("3", "Pre-Workout Blast", "Explosive energy", 45.00, "https://example.com/pre.png", "Pre-Workout"));
-        products.add(new Product("4", "BCAA Recovery", "Muscle repair", 29.99, "https://example.com/bcaa.png", "Recovery"));
-        products.add(new Product("5", "Mass Gainer Pro", "For maximum size", 75.50, "https://example.com/gainer.png", "Mass Gainer"));
-        products.add(new Product("6", "Multi-Vitamin Pack", "Daily health", 19.99, "https://example.com/vit.png", "Vitamins"));
+    private void setupNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+            Fragment fragment = null;
+            int id = item.getItemId();
+            
+            if (id == R.id.nav_home) {
+                fragment = new HomeFragment();
+            } else if (id == R.id.nav_plans) {
+                fragment = new PlansFragment();
+            } else if (id == R.id.nav_map) {
+                fragment = new MapFragment();
+            } else if (id == R.id.nav_progress) {
+                fragment = new FitnessFragment();
+            } else if (id == R.id.nav_profile) {
+                fragment = new ProfileFragment();
+            }
 
-        // Setup RecyclerView
-        ProductAdapter adapter = new ProductAdapter(products);
-        binding.rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
-        binding.rvProducts.setAdapter(adapter);
+            if (fragment != null) {
+                loadFragment(fragment);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment)
+                .commit();
     }
 }

@@ -6,21 +6,35 @@
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground">
 
-    <!-- Top Exercise Image/GIF Area -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/imageContainer"
+    <!-- Overall Progress Bar -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/sessionProgress"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content"
+        android:progress="30"
+        app:indicatorColor="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackColor="?attr/colorSurfaceVariant"
+        app:trackThickness="4dp" />
 
-        <ImageView
+    <!-- Top Exercise Header Area -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clHeader"
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        app:layout_constraintTop_toBottomOf="@id/sessionProgress">
+
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivExerciseLarge"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@android:color/darker_gray" />
+            android:src="@drawable/logo_dark" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/black_gradient_bottom" />
 
         <ImageButton
             android:id="@+id/btnClose"
@@ -29,15 +43,45 @@
             android:layout_margin="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
-    </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvExerciseTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="Dumbbell Incline Fly"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tvExerciseSub"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvExerciseSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="24dp"
+            android:text="Set 1 of 3 • 12 Reps"
+            android:textColor="@color/white"
+            android:alpha="0.8"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Workout Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/bottomControls"
-        app:layout_constraintTop_toBottomOf="@id/imageContainer">
+        app:layout_constraintTop_toBottomOf="@id/clHeader">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,39 +90,25 @@
             android:padding="24dp">
 
             <TextView
-                android:id="@+id/tvExerciseTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dumbbell Incline Fly"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvExerciseSub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Set 1 of 3 • 12 Reps"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="18sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Instructions"
-                android:textSize="16sp"
+                android:text="HOW TO DO IT"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
+                android:textColor="?attr/colorPrimary"
+                android:letterSpacing="0.1" />
 
             <TextView
                 android:id="@+id/tvInstructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:text="1. Lie on a bench set to a 30-45 degree incline.\n2. Hold dumbbells with a neutral grip.\n3. Lower weights in an arc until chest stretch.\n4. Squeeze chest to return to top."
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="15sp"
-                android:lineSpacingExtra="4dp" />
+                android:textSize="16sp"
+                android:lineSpacingExtra="6dp" />
+
+            <!-- Additional stats or equipment info could go here -->
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -88,44 +118,44 @@
         android:id="@+id/bottomControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
+        android:background="?android:attr/windowBackground"
+        android:elevation="8dp"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPrevious"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:icon="@android:drawable/ic_media_previous"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?android:attr/textColorPrimary" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDone"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_marginHorizontal="16dp"
-            android:text="DONE"
-            android:textSize="18sp"
+            android:text="COMPLETE SET"
             android:textStyle="bold"
+            android:textSize="16sp"
             app:cornerRadius="32dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnNext"
             app:layout_constraintStart_toEndOf="@id/btnPrevious"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_next"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:icon="@android:drawable/ic_media_next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?android:attr/textColorPrimary" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

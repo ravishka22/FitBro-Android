@@ -25,6 +25,12 @@ public class WorkoutViewModel extends AndroidViewModel {
         allPlans = repository.getAllPlans();
         activePlan = repository.getActivePlan();
         allSessions = repository.getAllSessions();
+        
+        syncWithCloud();
+    }
+
+    public void syncWithCloud() {
+        repository.syncFromCloud();
     }
 
     public LiveData<List<WorkoutPlan>> getAllPlans() {
@@ -43,11 +49,14 @@ public class WorkoutViewModel extends AndroidViewModel {
         repository.update(plan);
     }
 
+    public void delete(WorkoutPlan plan) {
+        repository.delete(plan);
+    }
+
     public void setActivePlan(String planId) {
         repository.setActivePlan(planId);
     }
 
-    // Session methods
     public LiveData<List<WorkoutSession>> getAllSessions() {
         return allSessions;
     }

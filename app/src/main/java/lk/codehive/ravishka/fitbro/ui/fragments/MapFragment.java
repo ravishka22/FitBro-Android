@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,44 +24,30 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import lk.codehive.ravishka.fitbro.databinding.FragmentMapBinding;
+import lk.codehive.ravishka.fitbro.models.Gym;
+import lk.codehive.ravishka.fitbro.ui.adapters.UserGymAdapter;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private FragmentMapBinding binding;
     private GoogleMap googleMap;
-
-    private static class Gym {
-        String name;
-        String address;
-        String phoneNumber;
-        LatLng location;
-
-        Gym(String name, String address, String phoneNumber, LatLng location) {
-            this.name = name;
-            this.address = address;
-            this.phoneNumber = phoneNumber;
-            this.location = location;
-        }
-    }
-
-    private List<Gym> mockGyms;
+    private FirebaseFirestore db;
+    private final List<Gym> gymList = new ArrayList<>();
+    private UserGymAdapter gymAdapter;
     private Gym selectedGym;
 
     private final ActivityResultLauncher<String[]> locationPermissionRequest =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
                 Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
-                Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
                 if (fineLocationGranted != null && fineLocationGranted) {
                     enableMyLocation();
-                } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                    enableMyLocation();
-                } else {
-                    Toast.makeText(getContext(), "Location permission denied", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -74,18 +61,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        initMockGyms();
+        db = FirebaseFirestore.getInstance();
 
         if (binding != null) {
             binding.mapView.onCreate(savedInstanceState);
             binding.mapView.getMapAsync(this);
 
+            setupRecyclerView();
+
             binding.btnCallGym.setOnClickListener(v -> {
-                if (selectedGym != null && selectedGym.phoneNumber != null) {
-                    Intent intent = new Intent(Intent.ACTION_DIAL);
-                    intent.setData(Uri.parse("tel:" + selectedGym.phoneNumber));
-                    startActivity(intent);
+                if (selectedGym != null && selectedGym.getPhoneNumber() != null) {
+                    callGym(selectedGym.getPhoneNumber());
                 }
             });
             
@@ -93,32 +79,44 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void initMockGyms() {
-        mockGyms = new ArrayList<>();
-        mockGyms.add(new Gym("FitBro Central Gym", "123 Fitness Ave, Colombo", "0112345678", new LatLng(6.9271, 79.8612)));
-        mockGyms.add(new Gym("Power House Gym", "45 Galle Road, Colombo 03", "0112345679", new LatLng(6.9145, 79.8510)));
-        mockGyms.add(new Gym("Iron Paradise", "12 Havelock Road, Colombo 05", "0112345680", new LatLng(6.8910, 79.8650)));
-        mockGyms.add(new Gym("Urban Fitness", "78 Ward Place, Colombo 07", "0112345681", new LatLng(6.9180, 79.8720)));
+    private void setupRecyclerView() {
+        gymAdapter = new UserGymAdapter(gymList, new UserGymAdapter.OnGymClickListener() {
+            @Override
+            public void onGymClick(Gym gym) {
+                showGymDetails(gym);
+                if (googleMap != null) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(gym.getLatitude(), gym.getLongitude()), 15f));
+                }
+            }
+
+            @Override
+            public void onCallClick(Gym gym) {
+                callGym(gym.getPhoneNumber());
+            }
+        });
+        binding.rvGyms.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvGyms.setAdapter(gymAdapter);
+    }
+
+    private void callGym(String phoneNumber) {
+        if (phoneNumber != null) {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + phoneNumber));
+            startActivity(intent);
+        }
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         this.googleMap = map;
-
-        for (Gym gym : mockGyms) {
-            Marker marker = googleMap.addMarker(new MarkerOptions()
-                    .position(gym.location)
-                    .title(gym.name));
-            if (marker != null) {
-                marker.setTag(gym);
-            }
-        }
+        loadGymsFromFirestore();
+        checkLocationPermissions();
 
         googleMap.setOnMarkerClickListener(marker -> {
-            Gym gym = (Gym) marker.getTag();
-            if (gym != null) {
-                selectedGym = gym;
-                showGymDetails(gym);
+            selectedGym = (Gym) marker.getTag();
+            if (selectedGym != null) {
+                showGymDetails(selectedGym);
             }
             return false;
         });
@@ -127,17 +125,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             binding.cardGymInfo.setVisibility(View.GONE);
             selectedGym = null;
         });
+    }
 
-        if (!mockGyms.isEmpty()) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mockGyms.get(0).location, 13f));
-        }
+    private void loadGymsFromFirestore() {
+        db.collection("gyms").addSnapshotListener((value, error) -> {
+            if (error != null || value == null) return;
+            
+            if (googleMap != null) googleMap.clear();
+            gymList.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                Gym gym = doc.toObject(Gym.class);
+                gymList.add(gym);
+                
+                if (googleMap != null) {
+                    Marker marker = googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(gym.getLatitude(), gym.getLongitude()))
+                            .title(gym.getName()));
+                    if (marker != null) marker.setTag(gym);
+                }
+            }
+            gymAdapter.setGyms(gymList);
 
-        checkLocationPermissions();
+            if (!gymList.isEmpty() && googleMap != null) {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(gymList.get(0).getLatitude(), gymList.get(0).getLongitude()), 12f));
+            }
+        });
     }
 
     private void showGymDetails(Gym gym) {
-        binding.tvGymName.setText(gym.name);
-        binding.tvGymAddress.setText(gym.address);
+        selectedGym = gym;
+        binding.tvGymName.setText(gym.getName());
+        binding.tvGymAddress.setText(gym.getAddress());
         binding.cardGymInfo.setVisibility(View.VISIBLE);
     }
 
@@ -145,17 +164,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             enableMyLocation();
         } else {
-            locationPermissionRequest.launch(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            });
+            locationPermissionRequest.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
         }
     }
 
     private void enableMyLocation() {
         if (googleMap != null && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
-            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
     }
 

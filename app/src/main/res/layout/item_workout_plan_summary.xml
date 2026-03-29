@@ -5,41 +5,94 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="?android:attr/textColorSecondary">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <LinearLayout
-            android:id="@+id/llPlanInfo"
+        <View
+            android:id="@+id/viewIndicator"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/electric_green_variant"
+            app:layout_constraintBottom_toBottomOf="@id/tvPlanDesc"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvPlanTitle" />
+
+        <TextView
+            android:id="@+id/tvPlanTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnActivate"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginStart="16dp"
+            android:textColor="#1A1A1A"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/ivPlanMenu"
+            app:layout_constraintStart_toEndOf="@id/viewIndicator"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Full Body Strength" />
+
+        <TextView
+            android:id="@+id/tvPlanDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="#757575"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@id/tvPlanTitle"
+            app:layout_constraintStart_toStartOf="@id/tvPlanTitle"
+            app:layout_constraintTop_toBottomOf="@id/tvPlanTitle"
+            tools:text="Advanced • 8 Weeks • 5 days/week" />
+
+        <ImageView
+            android:id="@+id/ivPlanMenu"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="4dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#757575" />
+
+        <LinearLayout
+            android:id="@+id/llPlanStats"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toStartOf="@id/btnActivate"
+            app:layout_constraintStart_toStartOf="@id/tvPlanTitle"
+            app:layout_constraintTop_toBottomOf="@id/tvPlanDesc">
 
             <TextView
-                android:id="@+id/tvPlanTitle"
+                android:id="@+id/tvExerciseCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1st Workout Plan"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="#1A1A1A"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                tools:text="24 Exercises" />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="8dp"
+                android:background="#BDBDBD" />
 
             <TextView
-                android:id="@+id/tvPlanDesc"
+                android:id="@+id/tvCompletedSessions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2-Day Split • 6 months"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp" />
+                android:textColor="#757575"
+                android:textSize="11sp"
+                tools:text="12 Completed" />
+
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -48,10 +101,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ACTIVATE"
-            android:textSize="12sp"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            app:cornerRadius="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/ivPlanMenu" />
+
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_delete"
+            app:layout_constraintBottom_toBottomOf="@id/btnActivate"
+            app:layout_constraintEnd_toStartOf="@id/btnActivate"
+            app:layout_constraintTop_toTopOf="@id/btnActivate"
+            app:tint="#E57373" />
+
+        <TextView
+            android:id="@+id/tvPlanCreator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/electric_green_variant"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            app:layout_constraintStart_toStartOf="@id/tvPlanTitle"
+            app:layout_constraintTop_toBottomOf="@id/llPlanStats"
+            tools:text="By: Coach Ravishka" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

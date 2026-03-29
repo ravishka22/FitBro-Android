@@ -1,6 +1,7 @@
 package lk.codehive.ravishka.fitbro.ui.adapters;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -36,10 +37,29 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingAdapter.Traini
         holder.binding.tvExerciseDetails.setText(exercise.getSets() + " x " + exercise.getReps() + " reps");
         holder.binding.tvRestDetails.setText("rest " + exercise.getRest());
 
-        Glide.with(holder.itemView.getContext())
-                .load(exercise.getImageUrl())
-                .placeholder(android.R.color.darker_gray)
-                .into(holder.binding.ivExerciseThumbnail);
+        if (exercise.getImageUrl() != null && !exercise.getImageUrl().isEmpty()) {
+            holder.binding.ivExerciseThumbnail.setVisibility(View.VISIBLE);
+            holder.binding.tvExerciseInitials.setVisibility(View.GONE);
+            Glide.with(holder.itemView.getContext())
+                    .load(exercise.getImageUrl())
+                    .into(holder.binding.ivExerciseThumbnail);
+        } else {
+            holder.binding.ivExerciseThumbnail.setVisibility(View.GONE);
+            holder.binding.tvExerciseInitials.setVisibility(View.VISIBLE);
+            holder.binding.tvExerciseInitials.setText(getInitials(exercise.getName()));
+        }
+    }
+
+    private String getInitials(String name) {
+        if (name == null || name.isEmpty()) return "?";
+        String[] words = name.split("\\s+");
+        StringBuilder initials = new StringBuilder();
+        for (int i = 0; i < Math.min(words.length, 2); i++) {
+            if (!words[i].isEmpty()) {
+                initials.append(Character.toUpperCase(words[i].charAt(0)));
+            }
+        }
+        return initials.toString();
     }
 
     @Override
