@@ -2,6 +2,7 @@ package lk.codehive.ravishka.fitbro.ui;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -235,9 +236,13 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
         WorkoutSession session = new WorkoutSession(
                 planName, dayTitle, System.currentTimeMillis(), workoutExercises.size() * 45, duration
         );
-        viewModel.insertSession(session);
-        Toast.makeText(this, "Excellent! Workout Saved.", Toast.LENGTH_LONG).show();
-        finish();
+        
+        // Use standard showToast helper or safety check
+        if (!isFinishing()) {
+            viewModel.insertSession(session);
+            Toast.makeText(this, "Excellent! Workout Saved.", Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override

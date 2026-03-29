@@ -43,6 +43,7 @@ import lk.codehive.ravishka.fitbro.R;
 import lk.codehive.ravishka.fitbro.databinding.FragmentAdminUsersBinding;
 import lk.codehive.ravishka.fitbro.models.User;
 import lk.codehive.ravishka.fitbro.ui.adapters.AdminUsersAdapter;
+import lk.codehive.ravishka.fitbro.utils.NotificationHelper;
 
 public class AdminUsersFragment extends Fragment {
 
@@ -121,7 +122,6 @@ public class AdminUsersFragment extends Fragment {
                 if (user != null) {
                     user.setId(doc.getId());
                     String role = user.getRole();
-                    // Keep admins hidden from user management
                     if (role == null || !role.equalsIgnoreCase("admin")) {
                         allUsersList.add(user);
                     }
@@ -136,16 +136,13 @@ public class AdminUsersFragment extends Fragment {
 
         filteredList.clear();
         String query = binding.etSearchUsers.getText().toString().toLowerCase().trim();
-        
-        // Tab 0: Members (Free and Pro), Tab 1: Trainers
         boolean showTrainers = (currentTab == 1);
 
         for (User user : allUsersList) {
             String role = user.getRole();
-            if (role == null) role = "member";
+            if (role == null || role.equalsIgnoreCase("user")) role = "member";
             role = role.toLowerCase();
 
-            // Broad matching: Tab 0 shows anything that is NOT a trainer (handling "member", "pro", "user", etc.)
             boolean isTrainer = role.contains("trainer");
             boolean matchesTab = showTrainers ? isTrainer : !isTrainer;
 
@@ -208,6 +205,15 @@ public class AdminUsersFragment extends Fragment {
 
             db.collection("users").document(user.getId()).update(updates).addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Account details updated", Toast.LENGTH_SHORT).show();
+                
+                // Trigger notification for the user
+                NotificationHelper.triggerNotification(
+                        user.getId(),
+                        "Account Updated",
+                        "An administrator has updated your account settings.",
+                        "admin_update"
+                );
+                
                 dialog.dismiss();
             });
         });

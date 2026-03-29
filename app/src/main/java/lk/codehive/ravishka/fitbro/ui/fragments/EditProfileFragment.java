@@ -44,7 +44,9 @@ public class EditProfileFragment extends Fragment {
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 if (uri != null) {
                     selectedImageUri = uri;
-                    Glide.with(this).load(uri).into(binding.ivEditProfileImage);
+                    if (binding != null) {
+                        Glide.with(this).load(uri).into(binding.ivEditProfileImage);
+                    }
                 }
             });
 
@@ -75,6 +77,7 @@ public class EditProfileFragment extends Fragment {
         if (authUser != null) {
             db.collection("users").document(authUser.getUid()).get()
                     .addOnSuccessListener(documentSnapshot -> {
+                        if (binding == null) return;
                         currentUser = documentSnapshot.toObject(User.class);
                         if (currentUser != null) {
                             binding.etFullName.setText(currentUser.getFullName());
@@ -97,6 +100,7 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void saveProfile() {
+        if (binding == null) return;
         String name = binding.etFullName.getText().toString().trim();
         if (name.isEmpty()) {
             binding.tilFullName.setError("Name is required");
@@ -114,10 +118,7 @@ public class EditProfileFragment extends Fragment {
 
     private void uploadImageAndSaveProfile(String name) {
         FirebaseUser authUser = mAuth.getCurrentUser();
-        if (authUser == null) {
-            binding.btnSaveProfile.setEnabled(true);
-            return;
-        }
+        if (authUser == null) return;
 
         Log.d(TAG, "Starting Cloudinary image upload for UID: " + authUser.getUid());
         
@@ -126,32 +127,22 @@ public class EditProfileFragment extends Fragment {
                 .option("folder", "profile_pics")
                 .option("public_id", authUser.getUid())
                 .callback(new UploadCallback() {
-                    @Override
-                    public void onStart(String requestId) {
-                        Log.d(TAG, "Upload started: " + requestId);
-                    }
-
-                    @Override
-                    public void onProgress(String requestId, long bytes, long totalBytes) {
-                    }
+                    @Override public void onStart(String requestId) {}
+                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
 
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
                         String photoUrl = (String) resultData.get("secure_url");
-                        Log.d(TAG, "Upload success: " + photoUrl);
                         updateProfileInfo(name, photoUrl);
                     }
 
                     @Override
                     public void onError(String requestId, ErrorInfo error) {
-                        Log.e(TAG, "Upload error: " + error.getDescription());
-                        binding.btnSaveProfile.setEnabled(true);
-                        Toast.makeText(getContext(), "Upload failed: " + error.getDescription(), Toast.LENGTH_SHORT).show();
+                        if (binding != null) binding.btnSaveProfile.setEnabled(true);
+                        showToast("Upload failed: " + error.getDescription());
                     }
 
-                    @Override
-                    public void onReschedule(String requestId, ErrorInfo error) {
-                    }
+                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
                 }).dispatch();
     }
 
@@ -171,36 +162,41 @@ public class EditProfileFragment extends Fragment {
         authUser.updateProfile(profileUpdates).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 if (currentUser == null) {
-                    // Standardized role "member"
                     currentUser = new User(authUser.getUid(), name, authUser.getEmail(), "member");
                 }
                 
-                currentUser.setFullName(name);
-                currentUser.setWeight(binding.etWeight.getText().toString().trim());
-                currentUser.setHeight(binding.etHeight.getText().toString().trim());
-                currentUser.setTargetWeight(binding.etTargetWeight.getText().toString().trim());
-                currentUser.setAge(binding.etAge.getText().toString().trim());
+                if (binding != null) {
+                    currentUser.setFullName(name);
+                    currentUser.setWeight(binding.etWeight.getText().toString().trim());
+                    currentUser.setHeight(binding.etHeight.getText().toString().trim());
+                    currentUser.setTargetWeight(binding.etTargetWeight.getText().toString().trim());
+                    currentUser.setAge(binding.etAge.getText().toString().trim());
+                }
                 if (photoUrl != null) currentUser.setPhotoUrl(photoUrl);
 
                 db.collection("users").document(authUser.getUid())
                         .set(currentUser, SetOptions.merge())
                         .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(getContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show();
+                            showToast("Profile updated successfully!");
                             if (isAdded()) {
                                 getParentFragmentManager().popBackStack();
                             }
                         })
                         .addOnFailureListener(e -> {
-                            Log.e(TAG, "Firestore update failed", e);
-                            binding.btnSaveProfile.setEnabled(true);
-                            Toast.makeText(getContext(), "Firestore error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            if (binding != null) binding.btnSaveProfile.setEnabled(true);
+                            showToast("Firestore error: " + e.getMessage());
                         });
             } else {
-                Log.e(TAG, "Auth profile update failed", task.getException());
-                binding.btnSaveProfile.setEnabled(true);
-                Toast.makeText(getContext(), "Auth update failed", Toast.LENGTH_SHORT).show();
+                if (binding != null) binding.btnSaveProfile.setEnabled(true);
+                showToast("Auth update failed");
             }
         });
+    }
+
+    private void showToast(String message) {
+        if (isAdded() && getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -1,21 +1,23 @@
 package lk.codehive.ravishka.fitbro.models;
 
+import com.google.firebase.firestore.IgnoreExtraProperties;
 import java.util.List;
 
+@IgnoreExtraProperties
 public class PlanRequest {
     private String id;
     private String userId;
     private String userName;
     private String userPhotoUrl;
-    private String trainerId; // Explicitly target a trainer
+    private String trainerId;
     private String goal;
     private String medicalConditions;
     private int preferredDays;
-    private String status; // "pending", "completed"
-    private List<String> photoUrls;
+    private String status; // "pending", "accepted", "rejected"
+    private List<String> photoUrls; // Cloudinary URLs
     private long timestamp;
 
-    public PlanRequest() {} // Required for Firestore
+    public PlanRequest() {}
 
     public PlanRequest(String id, String userId, String userName, String userPhotoUrl, String trainerId, String goal, String medicalConditions, int preferredDays, String status, List<String> photoUrls, long timestamp) {
         this.id = id;

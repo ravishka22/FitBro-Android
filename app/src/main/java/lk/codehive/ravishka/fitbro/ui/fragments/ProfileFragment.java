@@ -189,7 +189,7 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) return;
 
-        Toast.makeText(getContext(), "Uploading photo...", Toast.LENGTH_SHORT).show();
+        showToast("Uploading photo...");
         
         MediaManager.get().upload(uri)
                 .option("upload_preset", "fitbro")
@@ -207,12 +207,13 @@ public class ProfileFragment extends Fragment {
 
                         db.collection("users").document(user.getUid())
                                 .update("photoUrl", versionedUrl)
-                                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Photo updated!", Toast.LENGTH_SHORT).show());
+                                .addOnSuccessListener(aVoid -> showToast("Photo updated!"))
+                                .addOnFailureListener(e -> showToast("Failed to update profile data"));
                     }
 
                     @Override
                     public void onError(String requestId, ErrorInfo error) {
-                        Toast.makeText(getContext(), "Upload failed: " + error.getDescription(), Toast.LENGTH_SHORT).show();
+                        showToast("Upload failed: " + error.getDescription());
                     }
 
                     @Override public void onReschedule(String requestId, ErrorInfo error) {}
@@ -263,7 +264,7 @@ public class ProfileFragment extends Fragment {
 
         db.collection("users").document(mAuth.getUid()).set(updates, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Plan updated", Toast.LENGTH_SHORT).show();
+                    showToast("Plan updated");
                     Intent intent = new Intent(getContext(), SplashActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -299,7 +300,6 @@ public class ProfileFragment extends Fragment {
         String uid = user.getUid();
         WriteBatch batch = db.batch();
 
-        // Chain of data deletion tasks
         db.collection("workout_plans").whereEqualTo("targetUserId", uid).get()
             .addOnSuccessListener(plans -> {
                 for (DocumentSnapshot doc : plans) batch.delete(doc.getReference());
@@ -316,14 +316,11 @@ public class ProfileFragment extends Fragment {
                                     .addOnSuccessListener(gyms -> {
                                         for (DocumentSnapshot doc : gyms) batch.delete(doc.getReference());
                                         
-                                        // Delete payments subcollection items
                                         db.collection("users").document(uid).collection("payments").get()
                                             .addOnSuccessListener(payments -> {
                                                 for (DocumentSnapshot doc : payments) batch.delete(doc.getReference());
                                                 
-                                                // Finally delete the user document
                                                 batch.delete(db.collection("users").document(uid));
-                                                
                                                 executeAccountDeletion(user, batch);
                                             });
                                     });
@@ -336,16 +333,16 @@ public class ProfileFragment extends Fragment {
         batch.commit().addOnSuccessListener(aVoid -> {
             user.delete().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Account and all data deleted", Toast.LENGTH_LONG).show();
+                    showToast("Account and all data deleted");
                     navigateToSplash();
                 } else {
                     Log.e(TAG, "Auth deletion failed", task.getException());
-                    Toast.makeText(getContext(), "Security: Please re-login to delete account.", Toast.LENGTH_LONG).show();
+                    showToast("Security: Please re-login to delete account.");
                 }
             });
         }).addOnFailureListener(e -> {
             Log.e(TAG, "Batch deletion failed", e);
-            Toast.makeText(getContext(), "Error deleting data", Toast.LENGTH_SHORT).show();
+            showToast("Error deleting data");
         });
     }
 
@@ -353,7 +350,7 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null && user.getEmail() != null) {
             mAuth.sendPasswordResetEmail(user.getEmail())
-                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Reset link sent to " + user.getEmail(), Toast.LENGTH_LONG).show());
+                    .addOnSuccessListener(aVoid -> showToast("Reset link sent to " + user.getEmail()));
         }
     }
 
@@ -361,6 +358,12 @@ public class ProfileFragment extends Fragment {
         Intent intent = new Intent(getContext(), SplashActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    private void showToast(String message) {
+        if (isAdded() && getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -12,13 +12,15 @@
         <item name="colorOnSecondary">@color/black</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/deep_charcoal</item>
+        <item name="android:statusBarColor">@color/md_theme_dark_background</item>
         <item name="android:windowLightStatusBar">false</item>
         
-        <!-- Backgrounds -->
-        <item name="android:windowBackground">@color/deep_charcoal</item>
-        <item name="colorSurface">@color/surface_dark</item>
-        <item name="colorOnSurface">@color/text_primary</item>
+        <!-- Backgrounds & Surfaces -->
+        <item name="android:windowBackground">@color/md_theme_dark_background</item>
+        <item name="colorSurface">@color/md_theme_dark_surface</item>
+        <item name="colorOnSurface">@color/md_theme_dark_onSurface</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_dark_onSurfaceVariant</item>
+        <item name="colorOutlineVariant">@color/md_theme_dark_outlineVariant</item>
         
         <!-- Custom attributes -->
         <item name="logoSrc">@drawable/logo_dark</item>
@@ -26,18 +28,5 @@
         <!-- Apply Pill Styles globally -->
         <item name="materialButtonStyle">@style/Widget.FitBro.Button</item>
         <item name="textInputStyle">@style/Widget.FitBro.TextInputLayout</item>
-    </style>
-
-    <!-- Pill shaped Button Style -->
-    <style name="Widget.FitBro.Button" parent="Widget.Material3.Button">
-        <item name="cornerRadius">28dp</item>
-    </style>
-
-    <!-- Pill shaped TextInputLayout Style -->
-    <style name="Widget.FitBro.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="boxCornerRadiusTopStart">28dp</item>
-        <item name="boxCornerRadiusTopEnd">28dp</item>
-        <item name="boxCornerRadiusBottomStart">28dp</item>
-        <item name="boxCornerRadiusBottomEnd">28dp</item>
     </style>
 </resources>

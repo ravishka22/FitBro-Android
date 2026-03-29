@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -21,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import lk.codehive.ravishka.fitbro.R;
@@ -54,7 +63,6 @@ public class AdminGymsFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Pass "admin" as the user ID to bypass ownership checks in the adapter logic (we'll update adapter next)
         adapter = new TrainerGymsAdapter(gymList, "ADMIN_BYPASS", new TrainerGymsAdapter.OnGymActionListener() {
             @Override
             public void onEdit(Gym gym) {
@@ -73,7 +81,7 @@ public class AdminGymsFragment extends Fragment {
     private void loadGyms() {
         db.collection("gyms").addSnapshotListener((value, error) -> {
             if (error != null) return;
-            if (value != null) {
+            if (value != null && binding != null) {
                 gymList.clear();
                 for (QueryDocumentSnapshot doc : value) {
                     Gym gym = doc.toObject(Gym.class);
@@ -93,16 +101,45 @@ public class AdminGymsFragment extends Fragment {
         TextInputEditText etName = view.findViewById(R.id.etGymName);
         TextInputEditText etAddress = view.findViewById(R.id.etGymAddress);
         TextInputEditText etPhone = view.findViewById(R.id.etGymPhone);
-        TextInputEditText etLat = view.findViewById(R.id.etLatitude);
-        TextInputEditText etLon = view.findViewById(R.id.etLongitude);
+        EditText etLat = view.findViewById(R.id.etLatitude);
+        EditText etLon = view.findViewById(R.id.etLongitude);
+        TextView tvCoords = view.findViewById(R.id.tvSelectedCoords);
+        MapView miniMap = view.findViewById(R.id.mapPicker);
         MaterialButton btnSave = view.findViewById(R.id.btnSaveGym);
+
+        miniMap.onCreate(null);
+        miniMap.onResume();
+
+        miniMap.getMapAsync(map -> {
+            LatLng initialPos = new LatLng(6.9271, 79.8612); // Default Colombo
+            if (gym != null) {
+                initialPos = new LatLng(gym.getLatitude(), gym.getLongitude());
+                etLat.setText(String.valueOf(gym.getLatitude()));
+                etLon.setText(String.valueOf(gym.getLongitude()));
+                tvCoords.setText(String.format(Locale.getDefault(), "Selected: %.4f, %.4f", gym.getLatitude(), gym.getLongitude()));
+            }
+
+            final Marker[] pickerMarker = {null};
+            if (gym != null) {
+                pickerMarker[0] = map.addMarker(new MarkerOptions().position(initialPos).title("Gym Location"));
+            }
+            
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPos, 12f));
+
+            map.setOnMapClickListener(latLng -> {
+                if (pickerMarker[0] != null) pickerMarker[0].remove();
+                pickerMarker[0] = map.addMarker(new MarkerOptions().position(latLng).title("New Location"));
+                
+                etLat.setText(String.valueOf(latLng.latitude));
+                etLon.setText(String.valueOf(latLng.longitude));
+                tvCoords.setText(String.format(Locale.getDefault(), "Selected: %.4f, %.4f", latLng.latitude, latLng.longitude));
+            });
+        });
 
         if (gym != null) {
             etName.setText(gym.getName());
             etAddress.setText(gym.getAddress());
             etPhone.setText(gym.getPhoneNumber());
-            etLat.setText(String.valueOf(gym.getLatitude()));
-            etLon.setText(String.valueOf(gym.getLongitude()));
         }
 
         btnSave.setOnClickListener(v -> {
@@ -113,7 +150,7 @@ public class AdminGymsFragment extends Fragment {
             String lonStr = etLon.getText().toString().trim();
 
             if (name.isEmpty() || address.isEmpty() || phone.isEmpty() || latStr.isEmpty() || lonStr.isEmpty()) {
-                Toast.makeText(getContext(), "All fields required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Please select a location on the map and fill all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -124,7 +161,7 @@ public class AdminGymsFragment extends Fragment {
 
             db.collection("gyms").document(id).set(newGym)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getContext(), "Gym updated by Admin", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Gym updated successfully!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     });
         });

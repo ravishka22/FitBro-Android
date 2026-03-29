@@ -1,9 +1,12 @@
 package lk.codehive.ravishka.fitbro;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 import com.cloudinary.android.MediaManager;
@@ -27,31 +30,44 @@ public class FitBroApp extends Application {
         FirebaseApp.initializeApp(this);
         Log.d(TAG, "Firebase initialized");
 
-        // Initialize Stripe
-        PaymentConfiguration.init(getApplicationContext(), STRIPE_PUBLISHABLE_KEY);
-        Log.d(TAG, "Stripe initialized");
+        // 1. Initialize Notification Channels
+        createNotificationChannel();
 
-        // Initialize Cloudinary (Alternative to Firebase Storage)
+        // 2. Initialize Stripe
+        PaymentConfiguration.init(getApplicationContext(), STRIPE_PUBLISHABLE_KEY);
+        
+        // 3. Initialize Cloudinary
         initCloudinary();
         
-        // Log SHA-1 for easy registration
+        // 4. Log SHA-1 for registration
         logHashKey();
         
+        // 5. Initialize App Check
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
-        
         if (BuildConfig.DEBUG) {
-            firebaseAppCheck.installAppCheckProviderFactory(
-                    DebugAppCheckProviderFactory.getInstance());
-            Log.d(TAG, "App Check: Debug Provider installed");
+            firebaseAppCheck.installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance());
         } else {
-            firebaseAppCheck.installAppCheckProviderFactory(
-                    PlayIntegrityAppCheckProviderFactory.getInstance());
-            Log.d(TAG, "App Check: Play Integrity Provider installed");
+            firebaseAppCheck.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance());
         }
 
         firebaseAppCheck.addAppCheckListener(token -> {
             Log.d(TAG, "App Check Token Status: " + (token != null ? "Successfully Obtained" : "Failed to obtain"));
         });
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "fitbro_notifications_channel",
+                    "FitBro Alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Workout and payment alerts");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
     }
 
     private void initCloudinary() {
@@ -60,18 +76,12 @@ public class FitBroApp extends Application {
         config.put("api_key", "684774453656553");
         config.put("api_secret", "ZwXdaKllcVuooiQKar5_l2Yy1vE");
         MediaManager.init(this, config);
-        Log.d(TAG, "Cloudinary initialized");
     }
 
     public void logHashKey() {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                String hashKey = Base64.encodeToString(md.digest(), Base64.NO_WRAP);
-                Log.d(TAG, "Your SHA-1 Hash Key for Firebase: " + hashKey);
-                
                 MessageDigest mdSha1 = MessageDigest.getInstance("SHA1");
                 byte[] digest = mdSha1.digest(signature.toByteArray());
                 StringBuilder hexString = new StringBuilder();

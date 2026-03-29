@@ -12,13 +12,15 @@ import java.util.concurrent.Executors;
 
 import lk.codehive.ravishka.fitbro.models.WorkoutPlan;
 import lk.codehive.ravishka.fitbro.models.WorkoutSession;
+import lk.codehive.ravishka.fitbro.models.WeightLog;
 
-@Database(entities = {WorkoutPlan.class, WorkoutSession.class}, version = 11, exportSchema = false)
+@Database(entities = {WorkoutPlan.class, WorkoutSession.class, WeightLog.class}, version = 13, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutPlanDao workoutPlanDao();
     public abstract WorkoutSessionDao workoutSessionDao();
+    public abstract WeightLogDao weightLogDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

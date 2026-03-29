@@ -87,18 +87,27 @@ public class PlansFragment extends Fragment {
     private void listenForRequests() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
+            // Show status if request is pending OR accepted (accepted means trainer is building it)
             requestListener = db.collection("trainer_requests")
                     .whereEqualTo("userId", user.getUid())
-                    .whereEqualTo("status", "pending")
+                    .whereIn("status", List.of("pending", "accepted"))
                     .addSnapshotListener((value, error) -> {
                         if (binding == null) return;
                         if (value != null && !value.isEmpty()) {
                             DocumentSnapshot doc = value.getDocuments().get(0);
                             activeRequestId = doc.getId();
+                            String status = doc.getString("status");
                             
                             binding.cardRequestedStatus.setVisibility(View.VISIBLE);
-                            binding.tvRequestStatus.setText("Trainer is building your plan...");
-                            binding.btnRequestPlan.setEnabled(false); // Block new requests
+                            if ("accepted".equalsIgnoreCase(status)) {
+                                binding.tvRequestStatus.setText("Coach is building your custom plan... 🏗️");
+                                binding.btnEditRequest.setVisibility(View.GONE); // Hide edit if coach started building
+                            } else {
+                                binding.tvRequestStatus.setText("Waiting for coach to review... ⏳");
+                                binding.btnEditRequest.setVisibility(View.VISIBLE);
+                            }
+                            
+                            binding.btnRequestPlan.setEnabled(false);
                             binding.btnRequestPlan.setAlpha(0.5f);
                         } else {
                             activeRequestId = null;
@@ -216,10 +225,7 @@ public class PlansFragment extends Fragment {
 
         binding.btnCancelRequest.setOnClickListener(v -> confirmCancelRequest());
         
-        binding.btnEditRequest.setOnClickListener(v -> {
-            // Implementation for editing request could go here or navigate to TrainerRequestFragment with data
-            navigateToRequestPlan(); 
-        });
+        binding.btnEditRequest.setOnClickListener(v -> navigateToRequestPlan());
     }
 
     private void navigateToCreatePlan() {

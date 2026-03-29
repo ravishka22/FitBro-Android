@@ -11,6 +11,7 @@ import java.util.List;
 import lk.codehive.ravishka.fitbro.data.repository.WorkoutRepository;
 import lk.codehive.ravishka.fitbro.models.WorkoutPlan;
 import lk.codehive.ravishka.fitbro.models.WorkoutSession;
+import lk.codehive.ravishka.fitbro.models.WeightLog;
 
 public class WorkoutViewModel extends AndroidViewModel {
 
@@ -18,6 +19,7 @@ public class WorkoutViewModel extends AndroidViewModel {
     private final LiveData<List<WorkoutPlan>> allPlans;
     private final LiveData<WorkoutPlan> activePlan;
     private final LiveData<List<WorkoutSession>> allSessions;
+    private final LiveData<List<WeightLog>> allWeightLogs;
 
     public WorkoutViewModel(@NonNull Application application) {
         super(application);
@@ -25,6 +27,7 @@ public class WorkoutViewModel extends AndroidViewModel {
         allPlans = repository.getAllPlans();
         activePlan = repository.getActivePlan();
         allSessions = repository.getAllSessions();
+        allWeightLogs = repository.getWeightLogs();
         
         syncWithCloud();
     }
@@ -63,6 +66,23 @@ public class WorkoutViewModel extends AndroidViewModel {
 
     public void insertSession(WorkoutSession session) {
         repository.insertSession(session);
+    }
+
+    public LiveData<List<WeightLog>> getWeightLogs() {
+        return allWeightLogs;
+    }
+
+    public void addWeightLog(float weight) {
+        WeightLog log = new WeightLog(weight, System.currentTimeMillis(), ""); // UID handled in repo
+        repository.insertWeightLog(log);
+    }
+
+    public void updateWeightLog(WeightLog log) {
+        repository.updateWeightLog(log);
+    }
+
+    public void deleteWeightLog(WeightLog log) {
+        repository.deleteWeightLog(log);
     }
 
     public LiveData<Integer> getTotalCaloriesSince(long startTime) {

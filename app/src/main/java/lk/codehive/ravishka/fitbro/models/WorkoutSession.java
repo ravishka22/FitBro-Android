@@ -4,7 +4,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.firestore.IgnoreExtraProperties;
+
 @Entity(tableName = "workout_sessions")
+@IgnoreExtraProperties
 public class WorkoutSession {
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -13,9 +16,9 @@ public class WorkoutSession {
     private long timestamp;
     private int caloriesBurnt;
     private long durationMillis;
+    private String userId;
 
     // No-argument constructor required for Firestore deserialization
-    @Ignore
     public WorkoutSession() {}
 
     public WorkoutSession(String planName, String dayTitle, long timestamp, int caloriesBurnt, long durationMillis) {
@@ -39,4 +42,6 @@ public class WorkoutSession {
     public void setCaloriesBurnt(int caloriesBurnt) { this.caloriesBurnt = caloriesBurnt; }
     public long getDurationMillis() { return durationMillis; }
     public void setDurationMillis(long durationMillis) { this.durationMillis = durationMillis; }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }

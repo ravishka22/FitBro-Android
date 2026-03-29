@@ -4,80 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:background="#F8F9FA">
 
-    <!-- Top Map View -->
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardMap"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="320dp"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/tvNearbyTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Nearby Gyms"
-        android:textSize="18sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="Nearby Facilities"
+        android:textColor="#1A1A1A"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mapView" />
+        app:layout_constraintTop_toBottomOf="@id/cardMap" />
 
-    <!-- List of Gyms -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:text="Sorted by Distance"
+        android:textColor="#757575"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvNearbyTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvNearbyTitle" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvGyms"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvNearbyTitle"
         tools:listitem="@layout/item_gym_user" />
-
-    <!-- Floating Selection Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardGymInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:visibility="gone"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:id="@+id/tvGymName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="FitBro Central Gym"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvGymAddress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="123 Fitness Ave, Colombo"
-                android:textColor="?android:attr/textColorSecondary" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCallGym"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:text="CALL"
-                android:textStyle="bold"
-                app:icon="@android:drawable/stat_sys_phone_call"
-                app:iconGravity="textStart" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

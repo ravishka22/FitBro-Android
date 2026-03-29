@@ -32,6 +32,7 @@ import lk.codehive.ravishka.fitbro.R;
 import lk.codehive.ravishka.fitbro.databinding.FragmentCheckoutBinding;
 import lk.codehive.ravishka.fitbro.models.Payment;
 import lk.codehive.ravishka.fitbro.ui.SplashActivity;
+import lk.codehive.ravishka.fitbro.utils.NotificationHelper;
 
 public class CheckoutFragment extends Fragment {
 
@@ -125,7 +126,6 @@ public class CheckoutFragment extends Fragment {
         String uid = user.getUid();
         long startTime = System.currentTimeMillis();
         
-        // Calculate End Date (1 Month from now)
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(startTime);
         calendar.add(Calendar.MONTH, 1);
@@ -134,15 +134,11 @@ public class CheckoutFragment extends Fragment {
         String paymentId = UUID.randomUUID().toString();
         Payment payment = new Payment(paymentId, planPrice, startTime, targetPlan.toUpperCase());
 
-        // Save Payment History
         db.collection("users").document(uid).collection("payments").document(paymentId).set(payment);
 
-        // Update User Role, Pro Status and Dates
         Map<String, Object> updates = new HashMap<>();
         updates.put("isPro", true);
         
-        // Ensure role remains "member" if they are upgrading to a Pro athlete plan, 
-        // or "trainer" if they are upgrading to a trainer plan.
         String roleToSave = targetPlan.toLowerCase();
         if (roleToSave.equals("pro") || roleToSave.equals("user")) {
             roleToSave = "member";
@@ -153,7 +149,24 @@ public class CheckoutFragment extends Fragment {
         updates.put("membershipEndDate", endTime);
 
         db.collection("users").document(uid).set(updates, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> showSuccessDialog())
+                .addOnSuccessListener(aVoid -> {
+                    // Trigger Payment Notification for Member
+                    NotificationHelper.triggerNotification(
+                            uid,
+                            "Payment Successful! 💳",
+                            "Your " + targetPlan.toUpperCase() + " plan is now active. Let's get to work!",
+                            "payment_success"
+                    );
+
+                    // Trigger Notification for Admin
+                    NotificationHelper.notifyAdmins(
+                            "New Subscription! 💰",
+                            user.getDisplayName() + " has subscribed to the " + targetPlan.toUpperCase() + " plan.",
+                            "admin_alert"
+                    );
+
+                    showSuccessDialog();
+                })
                 .addOnFailureListener(e -> {
                     if (binding != null) {
                         binding.pbLoading.setVisibility(View.GONE);
@@ -174,8 +187,6 @@ public class CheckoutFragment extends Fragment {
 
         view.findViewById(R.id.btnDone).setOnClickListener(v -> {
             dialog.dismiss();
-            
-            // Redirect to SplashActivity to handle portal switching
             Intent intent = new Intent(getContext(), SplashActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

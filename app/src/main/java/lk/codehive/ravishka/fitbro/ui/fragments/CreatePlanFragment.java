@@ -26,9 +26,11 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +44,7 @@ import lk.codehive.ravishka.fitbro.models.Exercise;
 import lk.codehive.ravishka.fitbro.models.WorkoutDay;
 import lk.codehive.ravishka.fitbro.models.WorkoutPlan;
 import lk.codehive.ravishka.fitbro.ui.adapters.TrainingAdapter;
+import lk.codehive.ravishka.fitbro.utils.NotificationHelper;
 import lk.codehive.ravishka.fitbro.viewmodels.WorkoutViewModel;
 
 public class CreatePlanFragment extends Fragment {
@@ -267,9 +270,23 @@ public class CreatePlanFragment extends Fragment {
                 holder.binding.tvExerciseDetails.setVisibility(View.GONE);
                 holder.binding.tvRestDetails.setText(item.getMuscleGroup());
                 holder.binding.tvRestDetails.setVisibility(View.VISIBLE);
-                holder.itemView.setOnClickListener(v -> showSetsRepsDialog(item, dialog));
+                holder.itemView.setOnClickListener(v -> {
+                    if (isExerciseAlreadyAdded(item.getName())) {
+                        Toast.makeText(getContext(), "Exercise already added to this day", Toast.LENGTH_SHORT).show();
+                    } else {
+                        showSetsRepsDialog(item, dialog);
+                    }
+                });
             }
         });
+    }
+
+    private boolean isExerciseAlreadyAdded(String name) {
+        if (selectedDayIndex >= tempDays.size()) return false;
+        for (Exercise ex : tempDays.get(selectedDayIndex).getExercises()) {
+            if (ex.getName().equalsIgnoreCase(name)) return true;
+        }
+        return false;
     }
 
     private void showSetsRepsDialog(Exercise baseEx, BottomSheetDialog parentDialog) {
@@ -321,13 +338,6 @@ public class CreatePlanFragment extends Fragment {
 
         String planId = (editPlanId != null) ? editPlanId : UUID.randomUUID().toString();
         
-        // Logic refinement: 
-        // 1. If Member -> Always assign to self.
-        // 2. If Trainer -> 
-        //    a. If building from Request -> Assign to member.
-        //    b. If switch ON -> Save as template (targetUserId = null).
-        //    c. If switch OFF & no target -> Ask to select member (or for now, assume template if no member selected).
-
         String finalTargetUserId = targetUserId;
         if (finalTargetUserId == null && "member".equalsIgnoreCase(userRole)) {
             finalTargetUserId = user.getUid();
@@ -335,7 +345,6 @@ public class CreatePlanFragment extends Fragment {
 
         boolean isTemplate = binding.switchSaveAsTemplate.isChecked();
         if ("trainer".equalsIgnoreCase(userRole) && !isTemplate && finalTargetUserId == null) {
-            // Show member selection if it's meant to be a custom plan but no target yet
             showMemberSelectionDialog(name);
             return;
         }
@@ -366,6 +375,7 @@ public class CreatePlanFragment extends Fragment {
 
     private void executeSavePlan(String planId, String name, String targetId, boolean isTemplate) {
         FirebaseUser user = auth.getCurrentUser();
+        
         WorkoutPlan plan = new WorkoutPlan(
                 planId,
                 name,
@@ -384,18 +394,41 @@ public class CreatePlanFragment extends Fragment {
         plan.setValidUntil(currentTime + (4L * 7L * 24L * 60L * 60L * 1000L));
 
         if (targetId != null) {
-            // Assigned to a specific member
-            db.collection("users").document(targetId).collection("plans").document(planId).set(plan)
-                    .addOnSuccessListener(aVoid -> {
-                        db.collection("workout_plans").document(planId).set(plan);
+            // Assign to member: Deactivate other plans first
+            db.collection("users").document(targetId).collection("plans")
+                    .whereEqualTo("active", true)
+                    .get()
+                    .addOnSuccessListener(activePlans -> {
+                        WriteBatch batch = db.batch();
+                        for (DocumentSnapshot doc : activePlans) {
+                            batch.update(doc.getReference(), "active", false);
+                        }
+                        
+                        // Save the new plan as active
+                        plan.setActive(true);
+                        batch.set(db.collection("users").document(targetId).collection("plans").document(planId), plan);
+                        batch.set(db.collection("workout_plans").document(planId), plan);
+                        
                         if (requestId != null) {
-                            db.collection("trainer_requests").document(requestId).update("status", "accepted");
+                            // Fulfillment: Mark request as 'completed'
+                            batch.update(db.collection("trainer_requests").document(requestId), "status", "completed");
                         }
-                        if (targetId.equals(user.getUid())) {
-                            viewModel.syncWithCloud();
-                        }
-                        Toast.makeText(getContext(), "Plan assigned successfully!", Toast.LENGTH_SHORT).show();
-                        getParentFragmentManager().popBackStack();
+                        
+                        batch.commit().addOnSuccessListener(aVoid -> {
+                            // Trigger Notification for Member
+                            NotificationHelper.triggerNotification(
+                                    targetId,
+                                    "Plan Ready! 💪",
+                                    "Your coach has finished your custom workout plan. Check it out now!",
+                                    "plan_ready"
+                            );
+
+                            if (targetId.equals(user.getUid())) {
+                                viewModel.syncWithCloud();
+                            }
+                            Toast.makeText(getContext(), "Plan assigned successfully!", Toast.LENGTH_SHORT).show();
+                            getParentFragmentManager().popBackStack();
+                        });
                     });
         } else {
             // Reusable Template

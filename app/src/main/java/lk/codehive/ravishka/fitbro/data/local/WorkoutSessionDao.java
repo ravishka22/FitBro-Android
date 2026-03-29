@@ -22,4 +22,7 @@ public interface WorkoutSessionDao {
 
     @Query("SELECT COUNT(*) FROM workout_sessions WHERE timestamp >= :startTime")
     LiveData<Integer> getWorkoutCountSince(long startTime);
+
+    @Query("DELETE FROM workout_sessions")
+    void deleteAllSessions();
 }

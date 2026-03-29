@@ -12,7 +12,20 @@
           "package_name": "lk.codehive.ravishka.fitbro"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "148417960459-gjmqrmoa3qt6okhcrvl2t3ieiohdsk9h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lk.codehive.ravishka.fitbro",
+            "certificate_hash": "860f6115b3b92d7a3486b78f665c1fa345f1f8f5"
+          }
+        },
+        {
+          "client_id": "148417960459-hgg2tb928ughcnk9p6kjqilnbo4rpanh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBALvmc2yIgh4X2cSvYQJTLX4m1M2VmUtI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "148417960459-hgg2tb928ughcnk9p6kjqilnbo4rpanh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

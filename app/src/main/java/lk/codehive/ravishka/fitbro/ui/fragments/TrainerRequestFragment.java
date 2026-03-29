@@ -33,7 +33,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lk.codehive.ravishka.fitbro.databinding.FragmentTrainerRequestBinding;
+import lk.codehive.ravishka.fitbro.models.PlanRequest;
 import lk.codehive.ravishka.fitbro.models.User;
+import lk.codehive.ravishka.fitbro.utils.NotificationHelper;
 
 public class TrainerRequestFragment extends Fragment {
 
@@ -95,28 +97,25 @@ public class TrainerRequestFragment extends Fragment {
     }
 
     private void loadTrainers() {
-        // Robust query: check both lowercase and potential capitalization
         db.collection("users")
+                .whereEqualTo("role", "trainer")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<String> trainerNames = new ArrayList<>();
                     trainerList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String role = doc.getString("role");
-                        if (role != null && role.equalsIgnoreCase("trainer")) {
-                            String id = doc.getId();
-                            String name = doc.getString("fullName");
-                            if (name == null || name.isEmpty()) name = doc.getString("email");
-                            
-                            Map<String, String> trainer = new HashMap<>();
-                            trainer.put("id", id);
-                            trainer.put("name", name);
-                            trainerList.add(trainer);
-                            trainerNames.add(name);
-                        }
+                        String id = doc.getId();
+                        String name = doc.getString("fullName");
+                        if (name == null || name.isEmpty()) name = doc.getString("email");
+                        
+                        Map<String, String> trainer = new HashMap<>();
+                        trainer.put("id", id);
+                        trainer.put("name", name);
+                        trainerList.add(trainer);
+                        trainerNames.add(name);
                     }
                     
-                    if (isAdded()) {
+                    if (isAdded() && getContext() != null) {
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, trainerNames);
                         binding.spinnerTrainer.setAdapter(adapter);
                         binding.spinnerTrainer.setOnItemClickListener((parent, view, position, id) -> {
@@ -164,7 +163,7 @@ public class TrainerRequestFragment extends Fragment {
             return;
         }
 
-        int days = 0;
+        int days;
         try {
             days = Integer.parseInt(preferredDaysStr);
         } catch (NumberFormatException e) {
@@ -198,7 +197,7 @@ public class TrainerRequestFragment extends Fragment {
         int total = photosToUpload.size();
 
         for (Uri uri : photosToUpload) {
-            String publicId = user.getUid() + "_" + System.currentTimeMillis() + "_" + counter.get();
+            String publicId = "request_" + user.getUid() + "_" + System.currentTimeMillis() + "_" + counter.get();
             MediaManager.get().upload(uri)
                     .option("upload_preset", "fitbro")
                     .option("folder", "trainer_requests")
@@ -242,24 +241,37 @@ public class TrainerRequestFragment extends Fragment {
         String photoUrl = (currentUserProfile != null) ? currentUserProfile.getPhotoUrl() : null;
 
         if (name == null || name.isEmpty()) name = "Athlete";
+        
+        final String finalName = name;
+        final String trainerId = selectedTrainerId;
 
-        Map<String, Object> request = new HashMap<>();
-        request.put("id", requestId);
-        request.put("userId", authUser.getUid());
-        request.put("userName", name);
-        request.put("userPhotoUrl", photoUrl);
-        request.put("trainerId", selectedTrainerId);
-        request.put("goal", goal);
-        request.put("medicalConditions", medical);
-        request.put("preferredDays", days);
-        request.put("photoUrls", urls);
-        request.put("status", "pending");
-        request.put("timestamp", System.currentTimeMillis());
+        PlanRequest request = new PlanRequest(
+                requestId,
+                authUser.getUid(),
+                finalName,
+                photoUrl,
+                trainerId,
+                goal,
+                medical,
+                days,
+                "pending",
+                urls,
+                System.currentTimeMillis()
+        );
 
         db.collection("trainer_requests").document(requestId)
                 .set(request)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Request sent to trainer!", Toast.LENGTH_LONG).show();
+                    
+                    // Trigger Push Notification for Trainer
+                    NotificationHelper.triggerNotification(
+                            trainerId,
+                            "New Training Request! 🏋️‍♂️",
+                            finalName + " has requested a personalized workout plan.",
+                            "new_request"
+                    );
+
                     if (isAdded()) {
                         getParentFragmentManager().popBackStack();
                     }

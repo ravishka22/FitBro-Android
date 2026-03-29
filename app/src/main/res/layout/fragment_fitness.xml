@@ -4,82 +4,182 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground"
-    android:padding="16dp">
+    android:background="#F8F9FA">
 
-    <TextView
-        android:id="@+id/tvFitnessTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Your Progress"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardProgress"
+    <LinearLayout
+        android:id="@+id/llHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:strokeColor="?attr/colorPrimary"
-        app:strokeWidth="1dp"
-        app:layout_constraintTop_toBottomOf="@id/tvFitnessTitle">
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Progress Tracking"
+            android:textColor="#1A1A1A"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayoutProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/transparent"
+            app:tabIndicatorColor="@color/electric_green_variant"
+            app:tabIndicatorHeight="3dp"
+            app:tabSelectedTextColor="#1A1A1A"
+            app:tabTextColor="#757575"
+            app:tabMode="fixed"
+            app:tabGravity="fill">
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calendar" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Weight" />
+        </com.google.android.material.tabs.TabLayout>
+    </LinearLayout>
+
+    <!-- Calendar & Activities Container -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/containerActivities"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llHeader">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="40dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <CalendarView
+                        android:id="@+id/calendarViewWorkouts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
+                android:id="@+id/tvSelectedDateTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Weekly Goal"
+                android:layout_marginTop="24dp"
+                android:text="Activity on this day"
+                android:textColor="#1A1A1A"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <ProgressBar
-                android:id="@+id/pbWeeklyGoal"
-                style="?android:attr/progressBarStyleHorizontal"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvWorkoutHistory"
                 android:layout_width="match_parent"
-                android:layout_height="12dp"
-                android:layout_marginTop="16dp"
-                android:progress="40"
-                android:progressDrawable="@android:drawable/progress_horizontal"
-                android:progressTint="?attr/colorPrimary" />
-
-            <TextView
-                android:id="@+id/tvGoalText"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="2 / 5 Workouts Completed"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_workout_session" />
 
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.core.widget.NestedScrollView>
 
-    <TextView
-        android:id="@+id/tvHistoryTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Workout History"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardProgress" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvWorkoutHistory"
+    <!-- Weight Container -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/containerWeight"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvHistoryTitle"
-        tools:listitem="@layout/item_workout_session" />
+        app:layout_constraintTop_toBottomOf="@id/llHeader">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="40dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Weight Trend (kg)"
+                        android:textColor="#1A1A1A"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChartWeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="16dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddWeight"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="24dp"
+                android:text="LOG TODAY'S WEIGHT"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/electric_green"
+                android:textStyle="bold"
+                app:cornerRadius="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Weight History"
+                android:textColor="#1A1A1A"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvWeightHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

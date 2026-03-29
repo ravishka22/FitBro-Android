@@ -6,7 +6,6 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
 
 import java.util.List;
@@ -27,13 +26,13 @@ public class WorkoutPlan {
     private boolean active; 
     private int lastCompletedDayIndex;
     
-    private String creatorId;
+    private String creatorId; // UID of the trainer or member who built it
     private String creatorName; 
-    private String targetUserId;
-    private String requestId;
+    private String targetUserId; // UID of the member this is assigned to (null if it's a trainer template)
+    private String requestId; // Linked request ID if fulfilled from a queue
     private long createdAt;
     private long validUntil; 
-    private int todayDayIndex; // Added field for Firestore mapping if present
+    private int todayDayIndex; 
 
     @Ignore
     public WorkoutPlan() {
@@ -64,11 +63,14 @@ public class WorkoutPlan {
     public List<WorkoutDay> getDays() { return days; }
     public void setDays(List<WorkoutDay> days) { this.days = days; }
 
-    @PropertyName("active") // Match common Firestore naming
+    @PropertyName("active")
     public boolean isActive() { return active; }
     
     @PropertyName("active")
     public void setActive(boolean active) { this.active = active; }
+
+    @PropertyName("isActive") // Alias for legacy support
+    public void setIsActive(boolean active) { this.active = active; }
 
     public int getLastCompletedDayIndex() { return lastCompletedDayIndex; }
     public void setLastCompletedDayIndex(int lastCompletedDayIndex) { this.lastCompletedDayIndex = lastCompletedDayIndex; }

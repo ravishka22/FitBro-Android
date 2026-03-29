@@ -23,6 +23,16 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD9sM9NBY6BzJV-mELvTZ-8yGIc2KdagXg" />
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/app_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/electric_green" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="fitbro_notifications_channel" />
+
         <service
             android:name=".services.MyFirebaseMessagingService"
             android:exported="false">

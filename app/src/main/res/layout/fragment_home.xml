@@ -9,18 +9,19 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:attr/windowBackground">
+        android:background="#F8F9FA">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="20dp">
 
-            <!-- Elegant Header with Profile and Quick Action -->
+            <!-- Elegant Header -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:layout_marginBottom="32dp">
 
                 <LinearLayout
@@ -36,24 +37,24 @@
                         android:id="@+id/tvGreeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hi, Alex 👋"
-                        android:textColor="?android:attr/textColorPrimary"
+                        android:text="Hi, Athlete 👋"
+                        android:textColor="#1A1A1A"
                         android:textSize="28sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Let's reach your goals today!"
-                        android:textColor="?android:attr/textColorSecondary"
+                        android:layout_marginTop="2dp"
+                        android:text="Your journey continues today"
+                        android:textColor="#757575"
                         android:textSize="15sp" />
                 </LinearLayout>
 
                 <FrameLayout
                     android:id="@+id/flProfileContainer"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -76,21 +77,21 @@
                         android:gravity="center"
                         android:text="A"
                         android:textColor="@color/white"
-                        android:textSize="24sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
                         android:visibility="gone" />
                 </FrameLayout>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Sophisticated Activity Ring Dashboard -->
+            <!-- Activity Summary Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
                 app:cardCornerRadius="32dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -98,25 +99,14 @@
                     android:orientation="vertical"
                     android:padding="24dp">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="24dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Daily Activity"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="View Details"
-                            android:textColor="@color/electric_green"
-                            android:textStyle="bold"
-                            android:textSize="13sp" />
-                    </RelativeLayout>
+                        android:text="Daily Stats"
+                        android:textColor="#1A1A1A"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="20dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -124,96 +114,93 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <!-- Calories Ring -->
+                        <!-- Calories -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <com.google.android.material.progressindicator.CircularProgressIndicator
                                 android:id="@+id/pbCalories"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:progress="70"
-                                app:indicatorColor="@color/electric_green"
-                                app:indicatorSize="70dp"
-                                app:trackColor="?attr/colorOutlineVariant"
-                                app:trackThickness="8dp" />
-
+                                android:progress="65"
+                                app:indicatorColor="@color/electric_green_variant"
+                                app:indicatorSize="64dp"
+                                app:trackColor="#F0F0F0"
+                                app:trackThickness="7dp" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
-                                android:text="Calories"
+                                android:layout_marginTop="10dp"
+                                android:text="Energy"
+                                android:textColor="#1A1A1A"
                                 android:textStyle="bold"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
                         </LinearLayout>
 
-                        <!-- Active Time Ring -->
+                        <!-- Workouts -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <com.google.android.material.progressindicator.CircularProgressIndicator
                                 android:id="@+id/pbActiveTime"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:progress="45"
-                                app:indicatorColor="@color/electric_green"
-                                app:indicatorSize="70dp"
-                                app:trackColor="?attr/colorOutlineVariant"
-                                app:trackThickness="8dp" />
-
+                                android:progress="40"
+                                app:indicatorColor="@color/electric_green_variant"
+                                app:indicatorSize="64dp"
+                                app:trackColor="#F0F0F0"
+                                app:trackThickness="7dp" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="10dp"
                                 android:text="Active"
+                                android:textColor="#1A1A1A"
                                 android:textStyle="bold"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
                         </LinearLayout>
 
-                        <!-- Steps Ring -->
+                        <!-- Steps -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <com.google.android.material.progressindicator.CircularProgressIndicator
                                 android:id="@+id/pbSteps"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:progress="80"
-                                app:indicatorColor="@color/electric_green"
-                                app:indicatorSize="70dp"
-                                app:trackColor="?attr/colorOutlineVariant"
-                                app:trackThickness="8dp" />
-
+                                android:progress="85"
+                                app:indicatorColor="@color/electric_green_variant"
+                                app:indicatorSize="64dp"
+                                app:trackColor="#F0F0F0"
+                                app:trackThickness="7dp" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="10dp"
                                 android:text="Steps"
+                                android:textColor="#1A1A1A"
                                 android:textStyle="bold"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Focus Workout Banner -->
+            <!-- Focus Training Banner (Dark contrast) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
-                app:cardCornerRadius="32dp"
+                app:cardCornerRadius="36dp"
                 app:cardElevation="12dp"
                 app:cardBackgroundColor="@color/black"
                 app:strokeWidth="0dp">
@@ -228,12 +215,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/membership_card_gradient"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:text="RECOMMENDED"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="5dp"
+                        android:text="READY FOR NEXT?"
                         android:textColor="@color/black"
                         android:textSize="10sp"
                         android:textStyle="bold"
+                        android:letterSpacing="0.05"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -242,9 +230,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="Next Session"
+                        android:text="Session Loading..."
                         android:textColor="@color/white"
-                        android:textSize="24sp"
+                        android:textSize="26sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -255,9 +243,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Day 1 • Upper Body Strength"
+                        android:text="Check your training plan"
                         android:textColor="@color/white"
-                        android:alpha="0.7"
+                        android:alpha="0.6"
                         android:textSize="15sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -265,49 +253,33 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnStartWorkout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="56dp"
-                        android:layout_marginTop="24dp"
-                        android:paddingHorizontal="32dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginTop="28dp"
                         android:text="GO TRAIN"
+                        android:textColor="@color/black"
                         android:textStyle="bold"
+                        android:letterSpacing="0.1"
                         app:backgroundTint="@color/electric_green"
-                        app:cornerRadius="28dp"
+                        app:cornerRadius="32dp"
                         app:icon="@android:drawable/ic_media_play"
                         app:iconTint="@color/black"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvWorkoutSubtitle" />
 
-                    <ImageView
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:alpha="0.15"
-                        android:src="@drawable/logo_dark"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:tint="@color/electric_green" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Discovery Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Explore Community"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
+            <!-- Discovery Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardNearbyGym"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
-                app:cardCornerRadius="28dp"
+                app:cardCornerRadius="32dp"
                 app:cardElevation="0dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="1dp">
+                app:cardBackgroundColor="#F0F0F0"
+                app:strokeWidth="0dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -316,23 +288,24 @@
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivGymIcon"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:background="@drawable/membership_card_gradient"
-                        android:padding="16dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@color/white"
+                        android:padding="14dp"
                         android:src="@android:drawable/ic_dialog_map"
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.FitBro.Circle"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/black" />
+                        app:tint="@color/electric_green_variant" />
 
                     <TextView
                         android:id="@+id/tvGymTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
-                        android:text="Partner Gyms"
+                        android:text="Find Facilities"
+                        android:textColor="#1A1A1A"
                         android:textSize="17sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -342,8 +315,8 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Find certified FitBro facilities near you"
-                        android:textColor="?android:attr/textColorSecondary"
+                        android:text="Explore certified partner gyms"
+                        android:textColor="#757575"
                         android:textSize="13sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@id/tvGymTitle"

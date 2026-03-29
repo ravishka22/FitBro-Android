@@ -27,6 +27,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import lk.codehive.ravishka.fitbro.R;
 import lk.codehive.ravishka.fitbro.databinding.FragmentTrainerHomeBinding;
 import lk.codehive.ravishka.fitbro.models.PlanRequest;
 import lk.codehive.ravishka.fitbro.ui.adapters.PlanRequestAdapter;
+import lk.codehive.ravishka.fitbro.utils.NotificationHelper;
 
 public class TrainerHomeFragment extends Fragment {
 
@@ -110,13 +113,20 @@ public class TrainerHomeFragment extends Fragment {
     private void confirmRejectRequest(PlanRequest request) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Reject Request")
-                .setMessage("Are you sure you want to reject " + request.getUserName() + "'s request? This will permanently delete the request.")
+                .setMessage("Are you sure you want to reject " + request.getUserName() + "'s request?")
                 .setPositiveButton("REJECT", (dialog, which) -> {
-                    // Logic changed: Delete from database as requested
                     db.collection("trainer_requests").document(request.getId())
                             .delete()
-                            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Request rejected and deleted", Toast.LENGTH_SHORT).show())
-                            .addOnFailureListener(e -> Toast.makeText(getContext(), "Error deleting request", Toast.LENGTH_SHORT).show());
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(getContext(), "Request rejected and deleted", Toast.LENGTH_SHORT).show();
+                                // Notify Member
+                                NotificationHelper.triggerNotification(
+                                        request.getUserId(),
+                                        "Request Update",
+                                        "Your training request was declined by the coach.",
+                                        "request_rejected"
+                                );
+                            });
                 })
                 .setNegativeButton("CANCEL", null)
                 .show();
@@ -171,6 +181,13 @@ public class TrainerHomeFragment extends Fragment {
                 db.collection("trainer_requests").document(request.getId())
                         .update("status", "accepted")
                         .addOnSuccessListener(aVoid -> {
+                            // Notify Member: Coach started building
+                            NotificationHelper.triggerNotification(
+                                    request.getUserId(),
+                                    "Good News! 🚀",
+                                    "Your coach has accepted your request and is building your plan.",
+                                    "request_accepted"
+                            );
                             dialog.dismiss();
                             navigateToPlanCreator(request);
                         });
@@ -205,13 +222,9 @@ public class TrainerHomeFragment extends Fragment {
 
         requestsListener = db.collection("trainer_requests")
                 .whereEqualTo("trainerId", trainerId)
-                .whereIn("status", List.of("pending", "accepted"))
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .whereIn("status", Arrays.asList("pending", "accepted"))
                 .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e(TAG, "Requests Error: " + error.getMessage());
-                        return;
-                    }
+                    if (error != null) return;
                     if (value != null && binding != null) {
                         List<PlanRequest> requests = new ArrayList<>();
                         int pendingCount = 0;
@@ -223,6 +236,7 @@ public class TrainerHomeFragment extends Fragment {
                                 pendingCount++;
                             }
                         }
+                        Collections.sort(requests, (r1, r2) -> Long.compare(r2.getTimestamp(), r1.getTimestamp()));
                         adapter.setRequests(requests);
                         binding.tvPendingCount.setText(String.valueOf(pendingCount));
                         binding.tvNoRequests.setVisibility(requests.isEmpty() ? View.VISIBLE : View.GONE);
