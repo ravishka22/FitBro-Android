@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     startStepCounter();
-                } else {
+                } else if (getContext() != null) {
                     Toast.makeText(getContext(), "Step tracking permission denied", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -75,19 +75,32 @@ public class HomeFragment extends Fragment {
         if (user != null) {
             // Priority: Firestore fullName > Auth displayName > Email prefix
             db.collection("users").document(user.getUid()).get().addOnSuccessListener(doc -> {
-                String name = doc.getString("fullName");
-                if (name == null || name.isEmpty()) name = user.getDisplayName();
-                if (name == null || name.isEmpty()) name = user.getEmail().split("@")[0];
-                
+                if (!isAdded() || binding == null) return;
+
+                String name = doc.contains("fullName") ? doc.getString("fullName") : null;
+                if (name == null || name.isEmpty()) {
+                    name = user.getDisplayName();
+                }
+                if (name == null || name.isEmpty()) {
+                    String email = user.getEmail();
+                    if (email != null && !email.isEmpty() && email.contains("@")) {
+                        name = email.split("@")[0];
+                    } else if (email != null && !email.isEmpty()) {
+                        name = email;
+                    } else {
+                        name = "User";
+                    }
+                }
+
                 binding.tvGreeting.setText("Hi, " + name + " 👋");
-                
+
                 // Set placeholder initials
-                String initials = name.substring(0, 1).toUpperCase();
+                String initials = !name.isEmpty() ? name.substring(0, 1).toUpperCase() : "U";
                 binding.tvProfilePlaceholder.setText(initials);
 
                 // Handle Image
                 String photoUrl = doc.getString("photoUrl");
-                if (photoUrl != null && !photoUrl.isEmpty()) {
+                if (photoUrl != null && !photoUrl.isEmpty() && getContext() != null) {
                     binding.tvProfilePlaceholder.setVisibility(View.GONE);
                     binding.ivProfileImage.setVisibility(View.VISIBLE);
                     Glide.with(this).load(photoUrl).placeholder(R.drawable.logo_dark).into(binding.ivProfileImage);
@@ -100,6 +113,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void checkStepCounterPermission() {
+        if (!isAdded() || getContext() == null) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
                 startStepCounter();
@@ -113,6 +127,7 @@ public class HomeFragment extends Fragment {
 
     private void startStepCounter() {
         stepCounterManager.startListening(steps -> {
+            if (!isAdded() || binding == null) return;
             // Goal is 10,000 steps
             int progress = (int) ((steps / 10000.0) * 100);
             binding.pbSteps.setProgress(Math.min(progress, 100), true);
@@ -129,6 +144,7 @@ public class HomeFragment extends Fragment {
 
         // Calories Progress
         viewModel.getTotalCaloriesSince(startOfToday).observe(getViewLifecycleOwner(), totalCalories -> {
+            if (binding == null) return;
             int calories = (totalCalories != null) ? totalCalories : 0;
             int progress = (int) ((calories / 1000.0) * 100);
             binding.pbCalories.setProgress(Math.min(progress, 100), true);
@@ -136,6 +152,7 @@ public class HomeFragment extends Fragment {
 
         // Active Workouts Progress
         viewModel.getWorkoutCountSince(startOfToday).observe(getViewLifecycleOwner(), count -> {
+            if (binding == null) return;
             int workoutCount = (count != null) ? count : 0;
             int progress = (workoutCount > 0) ? 100 : 0;
             binding.pbActiveTime.setProgress(progress, true);
@@ -143,9 +160,14 @@ public class HomeFragment extends Fragment {
 
         // Next Workout Session Observer
         viewModel.getActivePlan().observe(getViewLifecycleOwner(), plan -> {
+            if (binding == null) return;
             if (plan != null) {
                 binding.tvWorkoutTitle.setText("Ready for Next?");
-                binding.tvWorkoutSubtitle.setText("Today: " + plan.getDays().get(plan.getTodayDayIndex()).getDayTitle());
+                if (plan.getDays() != null && !plan.getDays().isEmpty() && plan.getTodayDayIndex() >= 0 && plan.getTodayDayIndex() < plan.getDays().size()) {
+                    binding.tvWorkoutSubtitle.setText("Today: " + plan.getDays().get(plan.getTodayDayIndex()).getDayTitle());
+                } else {
+                    binding.tvWorkoutSubtitle.setText("Today's Workout");
+                }
                 binding.btnStartWorkout.setEnabled(true);
             } else {
                 binding.tvWorkoutTitle.setText("No Active Plan");
@@ -156,18 +178,26 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupListeners() {
+        if (binding == null) return;
+
         binding.btnStartWorkout.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), TrainingActivity.class);
-            startActivity(intent);
+            if (getContext() != null) {
+                Intent intent = new Intent(getContext(), TrainingActivity.class);
+                startActivity(intent);
+            }
         });
 
         binding.flProfileContainer.setOnClickListener(v -> {
             // Navigation handled by MainActivity BottomNav, or trigger profile fragment
-            Toast.makeText(getContext(), "Switching to Profile...", Toast.LENGTH_SHORT).show();
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Switching to Profile...", Toast.LENGTH_SHORT).show();
+            }
         });
         
         binding.cardNearbyGym.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Locating Gyms...", Toast.LENGTH_SHORT).show();
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Locating Gyms...", Toast.LENGTH_SHORT).show();
+            }
             // In MainActivity, trigger the nav_map selection
         });
     }

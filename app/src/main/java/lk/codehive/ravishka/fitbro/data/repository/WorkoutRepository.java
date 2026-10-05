@@ -121,7 +121,7 @@ public class WorkoutRepository {
                 log.setUserId(user.getUid());
                 firestore.collection("users").document(user.getUid())
                         .collection("weight_logs").add(log)
-                        .addOnSuccessListener(docRef -> {
+                        .addOnSuccessListener(AppDatabase.databaseWriteExecutor, docRef -> {
                             log.setFirestoreId(docRef.getId());
                             weightLogDao.insert(log);
                         });
