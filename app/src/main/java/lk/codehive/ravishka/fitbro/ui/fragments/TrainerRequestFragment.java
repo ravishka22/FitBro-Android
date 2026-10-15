@@ -1,5 +1,6 @@
 package lk.codehive.ravishka.fitbro.ui.fragments;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -25,6 +27,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +68,34 @@ public class TrainerRequestFragment extends Fragment {
                     } else if ("back".equals(activePhotoType)) {
                         backUri = uri;
                         Glide.with(this).load(uri).into(binding.ivBack);
+                    }
+                }
+            });
+
+    private final ActivityResultLauncher<Void> takeCameraPhoto =
+            registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), bitmap -> {
+                if (bitmap != null && isAdded() && getContext() != null) {
+                    try {
+                        File tempFile = new File(requireContext().getCacheDir(), "physique_" + activePhotoType + "_" + System.currentTimeMillis() + ".jpg");
+                        FileOutputStream out = new FileOutputStream(tempFile);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                        out.flush();
+                        out.close();
+
+                        Uri uri = Uri.fromFile(tempFile);
+                        if ("front".equals(activePhotoType)) {
+                            frontUri = uri;
+                            Glide.with(this).load(uri).into(binding.ivFront);
+                        } else if ("side".equals(activePhotoType)) {
+                            sideUri = uri;
+                            Glide.with(this).load(uri).into(binding.ivSide);
+                        } else if ("back".equals(activePhotoType)) {
+                            backUri = uri;
+                            Glide.with(this).load(uri).into(binding.ivBack);
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error saving camera photo", e);
+                        Toast.makeText(getContext(), "Failed to capture photo", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -128,16 +161,31 @@ public class TrainerRequestFragment extends Fragment {
     private void setupPhotoListeners() {
         binding.llFrontPhoto.setOnClickListener(v -> {
             activePhotoType = "front";
-            launchPicker();
+            showPhotoOptionDialog();
         });
         binding.llSidePhoto.setOnClickListener(v -> {
             activePhotoType = "side";
-            launchPicker();
+            showPhotoOptionDialog();
         });
         binding.llBackPhoto.setOnClickListener(v -> {
             activePhotoType = "back";
-            launchPicker();
+            showPhotoOptionDialog();
         });
+    }
+
+    private void showPhotoOptionDialog() {
+        if (!isAdded() || getContext() == null) return;
+        String[] options = {"Take Photo (Camera)", "Choose from Gallery"};
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Physique Photo Source")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        takeCameraPhoto.launch(null);
+                    } else {
+                        launchPicker();
+                    }
+                })
+                .show();
     }
 
     private void launchPicker() {

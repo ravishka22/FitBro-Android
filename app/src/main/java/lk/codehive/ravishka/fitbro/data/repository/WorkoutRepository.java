@@ -120,11 +120,7 @@ public class WorkoutRepository {
             if (user != null) {
                 log.setUserId(user.getUid());
                 firestore.collection("users").document(user.getUid())
-                        .collection("weight_logs").add(log)
-                        .addOnSuccessListener(AppDatabase.databaseWriteExecutor, docRef -> {
-                            log.setFirestoreId(docRef.getId());
-                            weightLogDao.insert(log);
-                        });
+                        .collection("weight_logs").add(log);
             }
         });
     }

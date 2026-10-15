@@ -3,7 +3,6 @@ package lk.codehive.ravishka.fitbro.ui.fragments;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -208,16 +209,56 @@ public class CreatePlanFragment extends Fragment {
         binding.rvSelectedExercises.setAdapter(currentDayAdapter);
     }
 
+    private ItemTouchHelper currentSwipeHelper;
+
     private void updateExerciseList() {
         if (selectedDayIndex < tempDays.size()) {
-            currentDayAdapter = new TrainingAdapter(tempDays.get(selectedDayIndex).getExercises());
+            List<Exercise> currentExercises = tempDays.get(selectedDayIndex).getExercises();
+            currentDayAdapter = new TrainingAdapter(currentExercises);
             binding.rvSelectedExercises.setAdapter(currentDayAdapter);
+
+            if (currentSwipeHelper != null) {
+                currentSwipeHelper.attachToRecyclerView(null);
+            }
+
+            ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+                @Override
+                public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    int position = viewHolder.getBindingAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && position < currentExercises.size()) {
+                        Exercise removed = currentExercises.remove(position);
+                        currentDayAdapter.notifyItemRemoved(position);
+                        currentDayAdapter.notifyItemRangeChanged(position, currentExercises.size());
+                        Toast.makeText(getContext(), removed.getName() + " deleted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+
+            currentSwipeHelper = new ItemTouchHelper(swipeCallback);
+            currentSwipeHelper.attachToRecyclerView(binding.rvSelectedExercises);
         }
     }
 
     private void setupListeners() {
         binding.btnAddExercise.setOnClickListener(v -> showAddExerciseSheet());
         binding.btnSavePlan.setOnClickListener(v -> savePlan());
+    }
+
+    private String getSelectedCategory(ChipGroup chipGroup) {
+        if (chipGroup == null) return "All";
+        int checkedId = chipGroup.getCheckedChipId();
+        if (checkedId != View.NO_ID) {
+            Chip chip = chipGroup.findViewById(checkedId);
+            if (chip != null && chip.getText() != null) {
+                return chip.getText().toString();
+            }
+        }
+        return "All";
     }
 
     private void showAddExerciseSheet() {
@@ -228,35 +269,41 @@ public class CreatePlanFragment extends Fragment {
 
         EditText etSearch = view.findViewById(R.id.etSearch);
         ChipGroup cgFilters = view.findViewById(R.id.cgExFilters);
-        androidx.recyclerview.widget.RecyclerView rvLibrary = view.findViewById(R.id.rvExLibrary);
+        RecyclerView rvLibrary = view.findViewById(R.id.rvExLibrary);
 
         rvLibrary.setLayoutManager(new LinearLayoutManager(getContext()));
-        updateLibraryList(rvLibrary, "", "All", dialog);
+        updateLibraryList(rvLibrary, "", getSelectedCategory(cgFilters), dialog);
 
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String filter = "All";
-                int checkedId = cgFilters.getCheckedChipId();
-                if (checkedId != View.NO_ID) {
-                    Chip chip = cgFilters.findViewById(checkedId);
-                    if (chip != null) filter = chip.getText().toString();
-                }
-                updateLibraryList(rvLibrary, s.toString(), filter, dialog);
+                updateLibraryList(rvLibrary, s.toString(), getSelectedCategory(cgFilters), dialog);
             }
             @Override public void afterTextChanged(Editable s) {}
+        });
+
+        cgFilters.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            String category = getSelectedCategory(group);
+            String query = etSearch.getText().toString();
+            updateLibraryList(rvLibrary, query, category, dialog);
         });
 
         dialog.show();
     }
 
-    private void updateLibraryList(androidx.recyclerview.widget.RecyclerView rv, String query, String category, BottomSheetDialog dialog) {
+    private void updateLibraryList(RecyclerView rv, String query, String category, BottomSheetDialog dialog) {
         List<Exercise> filtered = new ArrayList<>();
         String lowerQuery = query.toLowerCase().trim();
 
         for (Exercise ex : exerciseLibrary) {
-            boolean matchesCategory = category.equals("All") || ex.getMuscleGroup().equalsIgnoreCase(category);
-            boolean matchesQuery = lowerQuery.isEmpty() || ex.getName().toLowerCase().contains(lowerQuery);
+            String muscle = ex.getMuscleGroup() != null ? ex.getMuscleGroup() : "";
+            boolean matchesCategory = category.equalsIgnoreCase("All")
+                    || muscle.equalsIgnoreCase(category)
+                    || muscle.toLowerCase().contains(category.toLowerCase());
+            boolean matchesQuery = lowerQuery.isEmpty()
+                    || ex.getName().toLowerCase().contains(lowerQuery)
+                    || muscle.toLowerCase().contains(lowerQuery);
+
             if (matchesCategory && matchesQuery) {
                 filtered.add(ex);
             }
@@ -305,6 +352,7 @@ public class CreatePlanFragment extends Fragment {
 
         final EditText inputReps = new EditText(getContext());
         inputReps.setHint("Reps");
+        inputReps.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         inputReps.setText("12");
         layout.addView(inputReps);
 
@@ -442,13 +490,35 @@ public class CreatePlanFragment extends Fragment {
 
     private void loadExerciseLibrary() {
         exerciseLibrary.clear();
+        populateDefaultExercises();
+
         db.collection("exercises").get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
+                exerciseLibrary.clear();
                 for (var doc : queryDocumentSnapshots) {
                     exerciseLibrary.add(new Exercise(doc.getString("name"), doc.getString("muscleGroup"), 0, "", "", doc.getString("imageUrl")));
                 }
             }
         });
+    }
+
+    private void populateDefaultExercises() {
+        exerciseLibrary.add(new Exercise("Bench Press", "Chest", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Incline Dumbbell Press", "Chest", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Chest Fly", "Chest", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Pull Ups", "Back", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Lat Pulldown", "Back", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Barbell Row", "Back", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Squats", "Legs", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Leg Press", "Legs", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Leg Extensions", "Legs", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Overhead Press", "Shoulders", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Lateral Raises", "Shoulders", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Barbell Bicep Curl", "Arms", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Tricep Pushdown", "Arms", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Hammer Curls", "Arms", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Plank", "Abs", 0, "", "", ""));
+        exerciseLibrary.add(new Exercise("Treadmill Run", "Cardio", 0, "", "", ""));
     }
 
     @Override
