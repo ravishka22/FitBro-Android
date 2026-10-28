@@ -8,6 +8,8 @@
 
 **FitBro** is a feature-packed, multi-role Android application designed to bridge the gap between fitness enthusiasts, personal trainers, and gym administrators. Built with modern Android architectural principles, FitBro delivers real-time workout tracking, custom fitness plans, e-commerce shop integration with Stripe payments, geolocation gym discovery via Google Maps, and comprehensive analytics.
 
+<img width="1920" height="1080" alt="m1" src="https://github.com/user-attachments/assets/38b7c7cf-3a39-43ec-93b9-46c3fe394334" />
+
 ---
 
 ## ✨ Features Breakdown
@@ -125,7 +127,19 @@ lk.codehive.ravishka.fitbro/
 
 ## 📱 Screenshots & Demo
 
-*(Add app screenshots or GIFs showcasing User, Trainer, and Admin dashboards here)*
+<img width="1920" height="1080" alt="a1" src="https://github.com/user-attachments/assets/ae1194df-2734-4b96-a9ff-21ed5581084e" />
+
+<img width="1920" height="1080" alt="a2" src="https://github.com/user-attachments/assets/c401f1e0-82c4-4b87-9375-d50c91646d94" />
+
+<img width="1920" height="1080" alt="a3" src="https://github.com/user-attachments/assets/c3863ac1-50cd-4366-b48d-eeb88343ae48" />
+
+<img width="1920" height="1080" alt="t1" src="https://github.com/user-attachments/assets/e956e962-935a-45b0-b2d9-395a5fe952f0" />
+
+<img width="1920" height="1080" alt="t2" src="https://github.com/user-attachments/assets/c369f349-8d9e-4682-b665-beec83a1317e" />
+
+<img width="1920" height="1080" alt="ad1" src="https://github.com/user-attachments/assets/53697ce1-395c-4755-baf5-50f3e8b35955" />
+
+<img width="1920" height="1080" alt="ad2" src="https://github.com/user-attachments/assets/27cc0646-7fed-4cf1-ab25-99cca9987802" />
 
 ---
 
